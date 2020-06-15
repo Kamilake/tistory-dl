@@ -41,7 +41,7 @@ public class Backup {
 		//String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
 		String myDir = "";
 
-		String path = myDir + "Backup/" + blogName + "/" + pageNum;
+		String path = myDir + "./../Backup/" + blogName + "/" + pageNum;
 		File blogroot = new File(myDir + "Backup/" + blogName);
 		if (!blogroot.exists())
 			blogroot.mkdir();
