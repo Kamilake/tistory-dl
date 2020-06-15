@@ -41,7 +41,7 @@ public class Backup {
 		//String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
 		String myDir = "";
 
-		String path = myDir + "./../Backup/" + blogName + "/" + pageNum;
+		String path = myDir + "Backup/" + blogName + "/" + pageNum;
 		File blogroot = new File(myDir + "Backup/" + blogName);
 		if (!blogroot.exists())
 			blogroot.mkdir();
@@ -102,7 +102,7 @@ public class Backup {
 				outStream.write(buf, 0, byteRead);
 				byteWritten += byteRead;
 			}
-
+			System.out.println("주소 :" + fileAddress);
 			System.out.println("이름 : " + localFileName);
 			System.out.println("크기 : " + byteWritten + "바이트");
 			System.out.println("다운로드 완료");
@@ -116,6 +116,7 @@ public class Backup {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
+			
 		}
 	}
 
@@ -172,6 +173,7 @@ public class Backup {
 		
 		
 		int pageNum = 303; //시작페이지 startPage
+		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 			int emptyPageCount = 0; //빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
@@ -220,16 +222,16 @@ public class Backup {
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
 
-				String innerHTML = blogView.getAttribute("innerHTML");
-				innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
-						"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
-				innerHTML = innerHTML.replaceAll("srcset=", "alt=");
-				for (int i = 0; i < 1000; i++)
-					innerHTML = innerHTML.replaceFirst("이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다", "img" + i + ".jpg");
-
-				BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
-				writer.write(innerHTML);
-				writer.close();
+				String innerHTML = blogView.getAttribute("innerHTML"); //사진 모두 찾고 치환시작
+//				innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
+//						"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
+//				innerHTML = innerHTML.replaceAll("srcset=", "alt=");
+//				for (int i = 0; i < 1000; i++)
+//					innerHTML = innerHTML.replaceFirst("이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다", "img" + i + ".jpg");
+//
+//				BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
+//				writer.write(innerHTML);
+//				writer.close();
 				//
 				//
 				//
@@ -238,24 +240,50 @@ public class Backup {
 				//
 				System.out.println("새 편집기 사진 검색 시작");
 				for (int i = 0; i < 1000; i++) {
+					imgNum = i; //이미지 중복제거시 번호 수정용 변수 리셋
 					try {
-						imageClass = driver.findElement(By.className("imageblock"));
+						//imageClass = driver.findElement(By.className("imageblock"));
+						imageClass = blogView.findElement(By.tagName("img"));
 					} catch (Exception e) {
 						System.out.println("새 편집기 사진 검색 완료 : " + i-- + "개");
 						break;
 					}
-					imageClass = imageClass.findElement(By.tagName("img"));
+					//imageClass = imageClass.findElement(By.tagName("img"));
 					imgURL[i] = imageClass.getAttribute("src");// 사진 주소들 저장해두기
 					// System.out.println("사진 " + i + " 주소: " + imgURL[i]);
 					System.out.println("사진 " + i);
-					fileUrlReadAndDownload(imgURL[i], "img" + i + ".jpg", saveDir(pageNum));
+					for(int j=0;j<i;j++) {//(제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
+						
+						if(imgURL[i] == imgURL[j])//if 원래이미지 == 지금 다운받으려고하는 이미지
+						imgNum = j; //then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
+						
+					}
+						
+						
+					
+					
+					fileUrlReadAndDownload(imgURL[i], "img" + imgNum + ".jpg", saveDir(pageNum));
 					JavascriptExecutor js_delimg = (JavascriptExecutor) driver;
 					js_delimg.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-							driver.findElement(By.className("imageblock")));
+							driver.findElement(By.tagName("img")));
 					try {
-						Thread.sleep(10);
+						Thread.sleep(0);
 					} catch (Exception e) {
 					} // sleepcatch
+					
+					/////////////html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
+					innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
+							"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
+					innerHTML = innerHTML.replaceAll("srcset=", "alt=");
+					for (int ii = 0; ii < 1000; ii++)
+						innerHTML = innerHTML.replaceFirst("이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다", "img" + ii + ".jpg");
+
+					BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
+					writer.write(innerHTML);
+					writer.close();
+	                /////////////html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분 끝
+					
+					
 				} // for (int i = 0; i < 1000; i++) }
 					//
 					//
