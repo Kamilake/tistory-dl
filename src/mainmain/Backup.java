@@ -172,7 +172,7 @@ public class Backup {
 	public void crawl() {
 		
 		
-		int pageNum = 303; //시작페이지 startPage
+		int pageNum = 4; //시작페이지 startPage
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
@@ -191,6 +191,22 @@ public class Backup {
 				//
 				//
 				//
+				
+				//제목 다운로드
+				try {
+				    OutputStream title = new FileOutputStream(saveDir(pageNum) + "/Title_Info.txt");
+				    WebElement titleElement;
+				    titleElement = driver.findElement(By.className("blogview_tit"));
+				    titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
+				    System.out.println(titleElement.getText());
+				    byte[] by=titleElement.getText().getBytes();
+				    title.write(by);
+				    title.close();
+				} catch (Exception e) {
+			            System.out.println("제목이 생각했던 위치에 없는 것 같군요.. 제목 저장은 일단 넘어갑니다.");
+				}
+				
+				//System.out.println("번 : "); 303번 함대 유치원
 				System.out.println("페이지가 존재하는지 확인");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
