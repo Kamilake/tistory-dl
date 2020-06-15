@@ -254,29 +254,26 @@ public class Backup {
 					System.out.println("사진 " + i);
 					for(int j=0;j<i;j++) {//(제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
 						
-						if(imgURL[i] == imgURL[j])//if 원래이미지 == 지금 다운받으려고하는 이미지
+						if(imgURL[i].equals(imgURL[j])) {//if 지금 다운받으려고하는 이미지 == 원래이미지
 						imgNum = j; //then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-						
+						System.out.println("이미지 중복 발견 : img"+i+".jpg는 img"+j+".jpg와 같기 때문에 img"+j+".jpg 파일로 통합하고 링크를 연결합니다.");
+						break;
+						}	
 					}
-						
-						
+					
 					
 					
 					fileUrlReadAndDownload(imgURL[i], "img" + imgNum + ".jpg", saveDir(pageNum));
 					JavascriptExecutor js_delimg = (JavascriptExecutor) driver;
 					js_delimg.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.tagName("img")));
-					try {
-						Thread.sleep(0);
-					} catch (Exception e) {
-					} // sleepcatch
+					
+					//이 시점에서 imgurl[imgnum] 속 링크는 "img" + imgNum + ".jpg" 와 같다.
 					
 					/////////////html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
-					innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
-							"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
-					innerHTML = innerHTML.replaceAll("srcset=", "alt=");
-					for (int ii = 0; ii < 1000; ii++)
-						innerHTML = innerHTML.replaceFirst("이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다", "img" + ii + ".jpg");
+					innerHTML = innerHTML.replaceAll("srcset=", "alt="); //크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
+					//for (int ii = 0; ii < 1000; ii++)
+						innerHTML = innerHTML.replaceFirst(imgURL[imgNum], "img" + imgNum + ".jpg");
 
 					BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
 					writer.write(innerHTML);
