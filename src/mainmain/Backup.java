@@ -23,13 +23,12 @@ import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 
-
 public class Backup {
-	//String blogTitle = new String();
+	// String blogTitle = new String();
 	static String blogName = new String();
-	//String pageTitle = new String();
+	// String pageTitle = new String();
 
-	//String[] imgTitle = new String[1000];
+	// String[] imgTitle = new String[1000];
 	String[] imgURL = new String[1000];
 
 	static int lyricLength;
@@ -37,15 +36,15 @@ public class Backup {
 
 	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
-		//String blogName = "testblog2";
+		// String blogName = "testblog2";
 		String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
-		//String myDir = "";
+		// String myDir = "";
 
 		String path = myDir + "Backup/" + blogName + "/" + pageNum;
 		File blogroot = new File(myDir + "Backup/" + blogName);
 		if (!blogroot.exists())
 			blogroot.mkdir();
-		
+
 		File folder = new File(path);
 		if (!folder.exists())
 			folder.mkdir();
@@ -116,7 +115,7 @@ public class Backup {
 			} catch (IOException e) {
 				e.printStackTrace();
 			}
-			
+
 		}
 	}
 
@@ -132,11 +131,11 @@ public class Backup {
 		System.out.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
 		System.out.println("참고: 지금은 블로그 본문 HTML 텍스트와 사진만 백업이 가능합니다.");
 		System.out.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
-		
+
 		System.out.println("\nHyper Tistory Backup v1.0.0-alpha  -  Kamilake.com\n");
-		
+
 		blogName = "bxmpe";
-		
+
 		System.out.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
 		blogName = scan.nextLine();
@@ -154,8 +153,7 @@ public class Backup {
 	// Properties
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver";
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe";
-	
-	
+
 	// private String base_url = "https://papago.naver.com/?sk=ja";
 
 	public Backup() {
@@ -170,13 +168,14 @@ public class Backup {
 	}
 
 	public void crawl() {
-		
-		
-		int pageNum = 1214; //시작페이지 startPage
+
+		int pageNum = 1214; // 시작페이지 startPage
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
+
+		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
-			int emptyPageCount = 0; //빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
+			int emptyPageCount = 0; // 빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
 				System.out.println("검색중인 페이지 : " + pageNum);
@@ -191,41 +190,42 @@ public class Backup {
 				//
 				//
 				//
-				
-				//제목 다운로드
+
+				// 제목 다운로드
 				try {
-				    OutputStream title = new FileOutputStream(saveDir(pageNum) + "/Title_Info.txt");
-				    WebElement titleElement;
-				    titleElement = driver.findElement(By.className("blogview_tit"));
-				    titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
-				    System.out.println(titleElement.getText());
-				    byte[] by=titleElement.getText().getBytes();
-				    title.write(by);
-				    title.close();
+					OutputStream title = new FileOutputStream(saveDir(pageNum) + "/Title_Info.txt");
+					WebElement titleElement;
+					titleElement = driver.findElement(By.className("blogview_tit"));
+					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
+					System.out.println(titleElement.getText());
+					byte[] by = titleElement.getText().getBytes();
+					title.write(by);
+					title.close();
 				} catch (Exception e) {
-			            System.out.println("제목이 생각했던 위치에 없는 것 같군요.. 제목 저장은 일단 넘어갑니다.");
+					System.out.println("제목이 생각했던 위치에 없는 것 같군요.. 제목 저장은 일단 넘어갑니다.");
 				}
 				try {
 					Thread.sleep(5000);
 				} catch (InterruptedException ee) {// 과도트래픽 방지
 				}
-				//System.out.println("번 : "); 303번 함대 유치원
+				// System.out.println("번 : "); 303번 함대 유치원
 				System.out.println("페이지가 존재하는지 확인");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
 					js_dellike.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-						driver.findElement(By.className("container_postbtn")));
-				}catch (Exception e) {
-					//if(과도트래픽 조건 확인) 과도트래픽이면 대기
+							driver.findElement(By.className("container_postbtn")));
+				} catch (Exception e) {
+					// if(과도트래픽 조건 확인) 과도트래픽이면 대기
 					// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
-					System.out.println("빈 페이지 건너뛰기 (연속 "+emptyPageCount+++"번째)");
-					if(emptyPageCount == 25) {
+					System.out.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
+					if (emptyPageCount == 25) {
 						System.out.println("백업이 모두 완료되었습니다.");
-						return; //종료.
+						return; // 종료.
 					}
 					continue;
-				}emptyPageCount=0;
-					
+				}
+				emptyPageCount = 0;
+
 				//
 				//
 				//
@@ -242,7 +242,7 @@ public class Backup {
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
 
-				String innerHTML = blogView.getAttribute("innerHTML"); //사진 모두 찾고 치환시작
+				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
 //				innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
 //						"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
 //				innerHTML = innerHTML.replaceAll("srcset=", "alt=");
@@ -260,50 +260,62 @@ public class Backup {
 				//
 				System.out.println("새 편집기 사진 검색 시작");
 				for (int i = 0; i < 1000; i++) {
-					imgNum = i; //이미지 중복제거시 번호 수정용 변수 리셋
+					imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
 					try {
-						//imageClass = driver.findElement(By.className("imageblock"));
+						// imageClass = driver.findElement(By.className("imageblock"));
 						imageClass = blogView.findElement(By.tagName("img"));
 					} catch (Exception e) {
 						System.out.println("새 편집기 사진 검색 완료 : " + i-- + "개");
 						break;
 					}
-					//imageClass = imageClass.findElement(By.tagName("img"));
+					// imageClass = imageClass.findElement(By.tagName("img"));
 					imgURL[i] = imageClass.getAttribute("src");// 사진 주소들 저장해두기
 					// System.out.println("사진 " + i + " 주소: " + imgURL[i]);
 					System.out.println("사진 " + i);
-					for(int j=0;j<i;j++) {//(제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
-						
-						if(imgURL[i].equals(imgURL[j])) {//if 지금 다운받으려고하는 이미지 == 원래이미지
-						imgNum = j; //then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-						System.out.println("이미지 중복 발견 : img"+i+".jpg는 img"+j+".jpg와 같기 때문에 img"+j+".jpg 파일로 통합하고 링크를 연결합니다.");
-						break;
-						}	
+					for (int j = 0; j < i; j++) {// (제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
+
+						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
+							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
+							System.out.println("이미지 중복 발견 : img" + i + ".jpg는 img" + j + ".jpg와 같기 때문에 img" + j
+									+ ".jpg 파일로 통합하고 링크를 연결합니다.");
+							break;
+						}
 					}
-					
-					
-					
-					try {
-					fileUrlReadAndDownload(imgURL[i], "img" + imgNum + ".jpg", saveDir(pageNum));
-					} catch(Exception e) {System.out.println("이미지 다운로드 오류 : "+imgNum); imgNum = 999; }
-					
+
+					try { // 링크 원본으로 치환 후 다운로드
+
+						if (imgURL[i].contains("daumcdn.net/cfile/tistory")) {
+							fileUrlReadAndDownload(imgURL[i]+"?original", "img" + imgNum + ".jpg", saveDir(pageNum));
+
+						}
+
+						else
+							fileUrlReadAndDownload(imgURL[i], "img" + imgNum + ".jpg", saveDir(pageNum));
+
+					} catch (Exception e) {
+						System.out.println("이미지 다운로드 오류 : " + imgNum);
+						imgNum = 999;
+					}
+
 					JavascriptExecutor js_delimg = (JavascriptExecutor) driver;
 					js_delimg.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.tagName("img")));
-					
-					//이 시점에서 imgurl[imgnum] 속 링크는 "img" + imgNum + ".jpg" 와 같다.
-					
-					/////////////html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
-					innerHTML = innerHTML.replaceAll("srcset=", "alt="); //크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
-					//for (int ii = 0; ii < 1000; ii++)
-						try {innerHTML = innerHTML.replaceFirst(imgURL[imgNum], "img" + imgNum + ".jpg");
-						} catch(Exception e) { System.out.println("이미지 주소를 교체할 수 없음.");}
+
+					// 이 시점에서 imgurl[imgnum] 속 링크는 "img" + imgNum + ".jpg" 와 같다.
+
+					///////////// html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
+					innerHTML = innerHTML.replaceAll("srcset=", "alt="); // 크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
+					// for (int ii = 0; ii < 1000; ii++)
+					try {
+						innerHTML = innerHTML.replaceFirst(imgURL[imgNum], "img" + imgNum + ".jpg");
+					} catch (Exception e) {
+						System.out.println("이미지 주소를 교체할 수 없음.");
+					}
 					BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
 					writer.write(innerHTML);
 					writer.close();
-	                /////////////html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분 끝
-					
-					
+					///////////// html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분 끝
+
 				} // for (int i = 0; i < 1000; i++) }
 					//
 					//
@@ -311,7 +323,7 @@ public class Backup {
 					//
 					//
 					//
-				//for (; true;); // 한개만 색인시 true
+					// for (; true;); // 한개만 색인시 true
 			} // 블로그 게시글 하나를 색인하는 for문 닫기
 
 		} catch (Exception e) {
