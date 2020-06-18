@@ -225,7 +225,7 @@ public class Backup {
 					} catch (Exception e2) {
 						// TODO: handle exception
 						//비밀번호 게시글일때
-						//자세한확인조건 추가필요
+						//자세한확인조건 추가필요 -> 완료((비밀번호 게시글)표시)
 						WebElement passwordInput;
 						try {
 							passwordInput= driver.findElement(By.id("password"));
