@@ -35,8 +35,8 @@ public class Backup {
 	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
 		// String blogName = "testblog2";
-		//String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
-		 String myDir = "";
+		String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
+		//String myDir = "";
 
 		String path = myDir + "Backup/" + blogName + "/" + pageNum;
 		File blogroot = new File(myDir + "Backup/" + blogName);
@@ -167,9 +167,12 @@ public class Backup {
 
 	public void crawl() {
 
-		int pageNum = 0; // 시작페이지 startPage
+		int pageNum = 10027; // 시작페이지 startPage
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		int delay = 4000; // 색인 딜레이
+		
+		
+		
 		
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		try {
@@ -228,7 +231,10 @@ public class Backup {
 							passwordInput= driver.findElement(By.id("password"));
 							passwordInput.sendKeys("yuri11");
 							passwordInput.sendKeys(Keys.ENTER);
-							System.out.println("비밀번호 게시글 ");
+							System.out.print("(비밀번호 게시글) ");
+							
+							// 비밀번호가 맞는지 확인하는 로직이 필요하다.
+							
 						} catch (Exception e3) {
 							// TODO: handle exception
 							System.out.println("빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
