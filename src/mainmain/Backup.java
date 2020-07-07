@@ -35,7 +35,7 @@ public class Backup {
 	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
 		// String blogName = "testblog2";
-		String myDir = "P:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
+		String myDir = "F:/Tistory/"; // 추후 자신의 exe파일이 있는 곳으로 교체
 		//String myDir = "";
 
 		String path = myDir + "Backup/" + blogName + "/" + pageNum;
@@ -167,9 +167,9 @@ public class Backup {
 
 	public void crawl() {
 
-		int pageNum = 10027; // 시작페이지 startPage
+		int pageNum = 0; // 시작페이지 startPage
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
-		int delay = 4000; // 색인 딜레이
+		int delay = 3500; // 색인 딜레이
 		
 		
 		
@@ -177,6 +177,9 @@ public class Backup {
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
+			System.out.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
+			System.in.read();
+			
 			int emptyPageCount = 0; // 빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
@@ -229,7 +232,7 @@ public class Backup {
 						WebElement passwordInput;
 						try {
 							passwordInput= driver.findElement(By.id("password"));
-							passwordInput.sendKeys("yuri11");
+							passwordInput.sendKeys("1111");
 							passwordInput.sendKeys(Keys.ENTER);
 							System.out.print("(비밀번호 게시글) ");
 							
