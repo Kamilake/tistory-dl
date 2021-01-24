@@ -29,17 +29,33 @@ import org.openqa.selenium.remote.DesiredCapabilities;
 
 public class Backup {
 	
-	static int delayFileDL = 2000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
-	static int delay = 3500; // 페이지 로딩 완료후 기다리는 시간 (이 값을 너무 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
-	static int pageNum = 250; // 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0)
+	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
+	static int delay = 2700; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
-	
 	static String myDir = "A:/Tistory/"; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
-	static String blogName = "lmyungsu"; //값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"")
-	static String password = "1111"; // 암호걸린 게시글의 암호
-	
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
+	
+	
+	
+
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	static int pageNum = 0; // 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0)
+	
+	static String blogName = "bxmpe"; //값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"")
+	
+	static String password = "1111"; // 암호걸린 게시글의 암호
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	
+	
+	
+	
+	
+	
 	
 	// String blogTitle = new String();
 	//static String blogName = new String();
@@ -150,15 +166,13 @@ public class Backup {
 		System.out.println("\nHyper Tistory Backup v1.1.2-alpha  -  Kamilake.com\n");
 
 		System.out.print("블로그 주소 앞 부분을 입력해주세요 : ");
-		
-		if(blogName.equals("")) {
 		Scanner scan = new Scanner(System.in);
+		if(blogName.equals("")) {
 		blogName = scan.nextLine();
-		scan.close();
 		} else System.out.println(blogName);
 		Backup backup = new Backup();
 		backup.crawl();
-		
+		scan.close();
 	}
 
 	// WebDriver
@@ -179,7 +193,7 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--window-size=1000,4000");
+		options.addArguments("--window-size=1500,4000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		
 		String downloadFilepath = (myDir+"DownloadTemp").replace("/","\\");
@@ -231,7 +245,7 @@ public class Backup {
 
 				// 제목 다운로드
 				System.out.println("=========="+pageNum+"==========");
-				System.out.print("페이지가 존재하는지 확인...");
+				System.out.print("[메타데이터] 페이지 찾는 중...");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
 					js_dellike.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
@@ -244,15 +258,15 @@ public class Backup {
 						if(blogView.getAttribute("innerHTML").equals("존재하지 않는 <span class=\"br_line\"><br></span>페이지 입니다.")) {
 							// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
 							System.out.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
-							
-							System.out.print(""+delay+"ms 대기중...");
+
+							System.out.print(""+(delay+1000)+"ms 대기중...");
 							try {
-								Thread.sleep(delay);
+								Thread.sleep(delay+1000);
 							} catch (InterruptedException ee) {// 다운로드
 							}
 							
 							if (emptyPageCount == emptyPageCheckLimit) {
-								System.out.println("백업이 모두 완료되었습니다.");
+								System.out.println("\n\n백업이 모두 완료되었습니다.");
 								return; // 종료.
 							}
 							} else {
@@ -294,7 +308,7 @@ public class Backup {
 					WebElement titleElement;
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
-					System.out.println(titleElement.getText());
+					System.out.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
 					byte[] by = titleElement.getText().getBytes();
 					title.write(by);
 					title.close();
@@ -431,7 +445,7 @@ public class Backup {
 						System.out.println("완료");
 						
 					} catch (Exception e) {
-						System.out.println("[첨부파일] 더 이상 블록 없음");
+						System.out.println("블록 없음");
 						System.out.println("[첨부파일] 다운로드 완료 : " + i-- + "개");
 						break;
 					}
@@ -521,7 +535,7 @@ public class Backup {
 							driver.findElement(By.className(targetBlock)));
 					System.out.println("[첨부파일] href삭제완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
-					
+					System.out.println("없음");
 					
 					try {
 						//System.out.println("href 없당"+e);
