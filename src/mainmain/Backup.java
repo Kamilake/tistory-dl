@@ -36,19 +36,15 @@ public class Backup {
 	static String myDir = "A:/Tistory/"; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
-	
-	
-	
 
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 0;
+	static int pageNum = 276;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "hongmeilin";
+	static String blogName = "bxmpe";
 	
 	/** 암호걸린 게시글의 암호 */
 	static String password = "1111";
@@ -68,7 +64,7 @@ public class Backup {
 	// String[] imgTitle = new String[1000];
 	String[] imgURL = new String[1000];
 	/** 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다. */
-	String[] imageRealname = new String[1000];
+	public static String[] imageRealname = new String[1000];
 	
 	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
@@ -117,7 +113,7 @@ public class Backup {
 	 * @param localFileName
 	 * @param downloadDir
 	 */
-	public static void fileUrlReadAndDownload(String fileAddress, String localFileName, String downloadDir) {
+	public static void fileUrlReadAndDownload(String fileAddress, String localFileName, String downloadDir,int imgNum) {
 		Log log = new Log();
 		OutputStream outStream = null;
 		URLConnection uCon = null;
@@ -137,7 +133,6 @@ public class Backup {
 			
 			//헤더예시 --> Content-Disposition: inline; filename="008.png"; filename*=UTF-8''008.png
 			// raw = "attachment; filename=abc.jpg"
-			log.println(extension_raw);
 			if(extension_raw != null && extension_raw.indexOf("filename=\"") != -1) {
 			    String netFileName = extension_raw.split("filename=\"")[1]; //getting value after '='
 			    netFileName = netFileName.split("\"")[0];
@@ -147,14 +142,14 @@ public class Backup {
 			    localFileName=localFileName+"_"+netFileName;
 			} else {
 			    // fall back to random generated file name?
-				//URL에서 확장자 찾아오는 부분이 이곳에 추가되어야 한다.
-				localFileName=localFileName+".jpg";
+				localFileName=localFileName+"_"+fileAddress.substring(fileAddress.lastIndexOf("/")+1);
+				//TODO: 저 URL 끝이 이미지 확장자가 맞는지(jpg png gif heic 등등) 확인해야 한다.
+				//localFileName=localFileName+".jpg";
 			}
 			
 			//파일이름찾는 부분 끝
 			outStream = new BufferedOutputStream(new FileOutputStream(downloadDir + "\\" + localFileName));
-			
-			
+			imageRealname[imgNum] = localFileName; //전역으로 이미지 이름을 저장. 추후 html에서 링크를 치환할 때 사용된다.
 			
 			
 
@@ -324,8 +319,6 @@ public class Backup {
 							log.print("(비밀번호 게시글) ");
 							
 							// 비밀번호가 맞는지 확인하는 로직이 필요하다.
-							
-							
 							//아래는 테스트 안됨 - 비번 체크 로직
 							try {
 							blogView = driver.findElement(By.className("blogview_content")); // 아무거나 하나 열어서 열리나 보기
@@ -339,7 +332,7 @@ public class Backup {
 							//위는 테스트 안됨 - 비번 체크 로직
 							
 						} catch (Exception e3) {
-							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							System.in.read();
 						}
 
@@ -448,7 +441,7 @@ public class Backup {
 						} else
 							log.println("[사진] 유형: 원본 이미지");
 
-						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum));
+						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum), imgNum);
 
 					} catch (Exception e) {
 						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
@@ -468,7 +461,10 @@ public class Backup {
 						//innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
 						
 						
-						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
+						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], imageRealname[imgNum]);
+						log.println("교체대상 : "+imgURL[imgNum]);
+						log.println("교체전주소 : "+"img" + imgNum + ".jpg");
+						log.println("교체후주소 : "+imageRealname[imgNum]);
 						
 						//imageRealname
 						//log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
