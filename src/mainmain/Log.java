@@ -6,7 +6,7 @@ public class Log {
 		// TODO Auto-generated constructor stub
 	}
 	
-	public int print(String string){
+	public int print(Object string){
         try{
         	System.out.print(string);
         }catch(Exception e){
