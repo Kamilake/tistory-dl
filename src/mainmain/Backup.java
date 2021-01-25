@@ -43,11 +43,15 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	static int pageNum = 0; // 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0)
 	
-	static String blogName = "shoko0410"; //값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"")
+	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
+	static int pageNum = 228;
 	
-	static String password = "1111"; // 암호걸린 게시글의 암호
+	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
+	static String blogName = "bxmpe";
+	
+	/** 암호걸린 게시글의 암호 */
+	static String password = "1111";
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -126,8 +130,29 @@ public class Backup {
 			int byteWritten = 0;
 			Url = new URL(fileAddress);
 			outStream = new BufferedOutputStream(new FileOutputStream(downloadDir + "\\" + localFileName));
-
 			uCon = Url.openConnection();
+			//파일이름찾는 부분 시작 @@@@티스토리에선 헤더에 파일 이름을 넣지 않는다. 즉 실패. 하지만 첨부파일 다운로드에선 빛을 보일 수 있을지도? 아직 테스트해보지 않았다.@@@@
+//			uCon.connect();
+//			String extension_raw = uCon.getHeaderField("Content-Disposition");
+//			// raw = "attachment; filename=abc.jpg"
+//			log.println(extension_raw);
+//			if(extension_raw != null && extension_raw.indexOf("=") != -1) {
+//			    String fileName = extension_raw.split("=")[1]; //getting value after '='
+//			    log.println("[파일] 원본 파일 이름 :" + fileName);
+//			    fileName = extension_raw.split(".")[1]; //getting value after '.'
+//			    log.println("[파일] 원본 파일 확장자 :" + fileName);
+//			} else {
+//			    // fall back to random generated file name?
+//			}
+			//이 주석 기준 윗부분: 헤더에서 이름 추출 / 아랫부분: URL에서 이름 추출
+			
+			
+			
+			
+			
+			
+			//파일이름찾는 부분 끝
+
 			is = uCon.getInputStream();
 			buf = new byte[size];
 			while ((byteRead = is.read(buf)) != -1) {
@@ -300,7 +325,7 @@ public class Backup {
 							blogView = driver.findElement(By.className("blogview_content")); // 아무거나 하나 열어서 열리나 보기
 							} catch (Exception e_pwerror)
 							{
-								log.println("[메타데이터] 암호가 맞지 않습니다.");
+								log.println("[메타데이터] 암호가 맞지 않습니다. #error");
 								//log.println(e_pwerror);
 								continue;
 							}
@@ -308,7 +333,7 @@ public class Backup {
 							//위는 테스트 안됨 - 비번 체크 로직
 							
 						} catch (Exception e3) {
-							log.println("빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							System.in.read();
 						}
 
