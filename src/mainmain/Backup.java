@@ -28,6 +28,7 @@ import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
 public class Backup {
+	Log log = new Log();
 	
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2700; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
@@ -44,7 +45,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	static int pageNum = 0; // 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0)
 	
-	static String blogName = "bxmpe"; //값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"")
+	static String blogName = "shoko0410"; //값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"")
 	
 	static String password = "1111"; // 암호걸린 게시글의 암호
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -113,6 +114,7 @@ public class Backup {
 	 * @param downloadDir
 	 */
 	public static void fileUrlReadAndDownload(String fileAddress, String localFileName, String downloadDir) {
+		Log log = new Log();
 		OutputStream outStream = null;
 		URLConnection uCon = null;
 
@@ -132,10 +134,10 @@ public class Backup {
 				outStream.write(buf, 0, byteRead);
 				byteWritten += byteRead;
 			}
-			System.out.println("[사진] 주소 :" + fileAddress);
-			System.out.println("[사진] 이름 : " + localFileName);
-			System.out.println("[사진] 크기 : " + byteWritten + "바이트");
-			System.out.println("[사진] 다운로드 완료");
+			log.println("[사진] 주소 :" + fileAddress);
+			log.println("[사진] 이름 : " + localFileName);
+			log.println("[사진] 크기 : " + byteWritten + "바이트");
+			log.println("[사진] 다운로드 완료");
 
 		} catch (Exception e) {
 			e.printStackTrace();
@@ -157,19 +159,20 @@ public class Backup {
 	 */
 
 	public static void main(String[] args) {////////// MAIN
-		System.out.println("참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
-		System.out.println("참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
-		System.out.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
-		System.out.println("참고: 지금은 블로그 본문 HTML 텍스트와 사진만 백업이 가능합니다.");
-		System.out.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
+		Log log = new Log();
+		log.println("참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
+		log.println("참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
+		log.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
+		log.println("참고: 지금은 블로그 본문 HTML 텍스트와 사진만 백업이 가능합니다.");
+		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 
-		System.out.println("\nHyper Tistory Backup v1.1.2-alpha  -  Kamilake.com\n");
+		log.println("\nHyper Tistory Backup v1.1.2-alpha  -  Kamilake.com\n");
 
-		System.out.print("블로그 주소 앞 부분을 입력해주세요 : ");
+		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
 		if(blogName.equals("")) {
 		blogName = scan.nextLine();
-		} else System.out.println(blogName);
+		} else log.println(blogName);
 		Backup backup = new Backup();
 		backup.crawl();
 		scan.close();
@@ -223,13 +226,13 @@ public class Backup {
 		
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
-			System.out.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
+			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
 			System.in.read();
 			
 			int emptyPageCount = 0; // 빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
-				System.out.println("검색중인 페이지 : " + pageNum);
+				log.println("검색중인 페이지 : " + pageNum);
 				driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum);
 				// liveBtn = driver.findElement(By.id("txtSource"));
 				// liveBtn.click();
@@ -244,8 +247,8 @@ public class Backup {
 				//
 
 				// 제목 다운로드
-				System.out.println("=========="+pageNum+"==========");
-				System.out.print("[메타데이터] 페이지 찾는 중...");
+				log.println("=========="+pageNum+"==========");
+				log.print("[메타데이터] 페이지 찾는 중...");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
 					js_dellike.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
@@ -257,22 +260,22 @@ public class Backup {
 						blogView = driver.findElement(By.className("tit_error"));
 						if(blogView.getAttribute("innerHTML").equals("존재하지 않는 <span class=\"br_line\"><br></span>페이지 입니다.")) {
 							// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
-							System.out.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
+							log.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
 
-							System.out.print(""+(delay+1000)+"ms 대기중...");
+							log.print(""+(delay+1000)+"ms 대기중...");
 							try {
 								Thread.sleep(delay+1000);
 							} catch (InterruptedException ee) {// 다운로드
 							}
 							
 							if (emptyPageCount == emptyPageCheckLimit) {
-								System.out.println("\n\n백업이 모두 완료되었습니다.");
+								log.println("\n\n백업이 모두 완료되었습니다.");
 								return; // 종료.
 							}
 							} else {
 
 								// if(과도트래픽 조건 확인) 과도트래픽이면 대기
-								System.out.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+								log.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 								System.in.read();
 							}
 							continue;
@@ -287,12 +290,25 @@ public class Backup {
 							passwordInput= driver.findElement(By.id("password"));
 							passwordInput.sendKeys(password);
 							passwordInput.sendKeys(Keys.ENTER);
-							System.out.print("(비밀번호 게시글) ");
+							log.print("(비밀번호 게시글) ");
 							
 							// 비밀번호가 맞는지 확인하는 로직이 필요하다.
 							
+							
+							//아래는 테스트 안됨 - 비번 체크 로직
+							try {
+							blogView = driver.findElement(By.className("blogview_content")); // 아무거나 하나 열어서 열리나 보기
+							} catch (Exception e_pwerror)
+							{
+								log.println("[메타데이터] 암호가 맞지 않습니다.");
+								//log.println(e_pwerror);
+								continue;
+							}
+							
+							//위는 테스트 안됨 - 비번 체크 로직
+							
 						} catch (Exception e3) {
-							System.out.println("빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println("빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							System.in.read();
 						}
 
@@ -301,41 +317,48 @@ public class Backup {
 					
 					
 				}
-				System.out.println("완료");
+				log.println("완료");
 				emptyPageCount = 0;
 				try {
 					OutputStream title = new FileOutputStream(saveDir(pageNum) + "/Title_Info.txt");
 					WebElement titleElement;
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
-					System.out.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
+					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
 					byte[] by = titleElement.getText().getBytes();
 					title.write(by);
 					title.close();
 				} catch (Exception e) {
-					System.out.println("[제목] 예상했던 곳에 제목이 적혀있지 않습니다.\n 티스토리가 변경되었거나 이 프로그램에 문제가 있습니다.");
+					log.println("[제목] 예상했던 곳에 제목이 적혀있지 않습니다.\n 티스토리가 변경되었거나 이 프로그램에 문제가 있습니다.");
+					//todo: 파일 건너뛰었다는 로그 찍기
+					log.print(""+(delay+1000)+"ms 대기중...");
+					try {
+						Thread.sleep(delay+1000);
+					} catch (InterruptedException ee) {// 다운로드
+					}
+					continue; // 다음으로 건너뛰기
 				}
-				System.out.print("[제목] "+delay+"ms 대기중...");
+				log.print("[제목] "+delay+"ms 대기중...");
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException ee) {// 과도트래픽 방지
 				}
-				System.out.println("완료");
+				log.println("완료");
 				//
 				//
 				//
 				//
 				//
 				//
-				//System.out.println(saveDir(pageNum));
-				System.out.print("[메타데이터] HTML 다운로드...");
+				//log.println(saveDir(pageNum));
+				log.print("[메타데이터] HTML 다운로드...");
 				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				File dest_scrFile = new File(saveDir(pageNum) + "/preview.jpg");
 				copyFileUsingStream(scrFile, dest_scrFile);
 				// container_postbtn #post_button_group (좋아요 공감 버튼)삭제
-				System.out.println("완료");
+				log.println("완료");
 				
-				System.out.print("[메타데이터] 미리보기 이미지 생성...");
+				log.print("[메타데이터] 미리보기 이미지 생성...");
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
 
@@ -355,25 +378,25 @@ public class Backup {
 				//
 				//
 				//
-				System.out.println("완료\n[사진] 사진 다운로드 시작");
+				log.println("완료\n[사진] 사진 다운로드 시작");
 				for (int i = 0; i < 1000; i++) {
 					imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
 					try {
 						// imageClass = driver.findElement(By.className("imageblock"));
 						imageClass = blogView.findElement(By.tagName("img"));
 					} catch (Exception e) {
-						System.out.println("[사진] 사진 다운로드 완료 : " + i-- + "개");
+						log.println("[사진] 사진 다운로드 완료 : " + i-- + "개");
 						break;
 					}
 					// imageClass = imageClass.findElement(By.tagName("img"));
 					imgURL[i] = imageClass.getAttribute("src");// 사진 주소들 저장해두기
-					// System.out.println("사진 " + i + " 주소: " + imgURL[i]);
-					System.out.println("[사진] 이미지 번호: " + i);
+					// log.println("사진 " + i + " 주소: " + imgURL[i]);
+					log.println("[사진] 이미지 번호: " + i);
 					for (int j = 0; j < i; j++) {// (제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
 
 						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
 							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-							System.out.println("[사진] 이미지 중복 발견 : img" + i + ".jpg는 img" + j + ".jpg와 같기 때문에 img" + j
+							log.println("[사진] 이미지 중복 발견 : img" + i + ".jpg는 img" + j + ".jpg와 같기 때문에 img" + j
 									+ ".jpg파일로 통합하고 링크를 연결합니다.");
 							break;
 						}
@@ -384,20 +407,20 @@ public class Backup {
 
 						if (imgURL[i].contains("daumcdn.net/cfile/tistory")) {
 							HiResURL = HiResURL + "?original";
-							System.out.println("[사진] 유형: DAUMCDN 원본");
+							log.println("[사진] 유형: DAUMCDN 원본");
 						} else if (imgURL[i].contains("daumcdn.net/thumb")) {
 
 							HiResURL = HiResURL.split("%3A%2F%2F")[1];
 							HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
 							HiResURL = HiResURL.replace("cfile", "http://cfile");
-							System.out.println("[사진] 유형: Tistory 구서버 원본");
+							log.println("[사진] 유형: Tistory 구서버 원본");
 						} else
-							System.out.println("[사진] 유형: 원본 이미지");
+							log.println("[사진] 유형: 원본 이미지");
 
 						fileUrlReadAndDownload(HiResURL, "img" + imgNum + ".jpg", saveDir(pageNum));
 
 					} catch (Exception e) {
-						System.out.println("[사진] 이미지 다운로드 오류 : " + imgNum);
+						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
 						imgNum = 999;
 					}
 
@@ -412,9 +435,9 @@ public class Backup {
 					// for (int ii = 0; ii < 1000; ii++)
 					try {
 						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
-						//System.out.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
+						//log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
 					} catch (Exception e) {
-						System.out.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
+						log.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
 					}
 					BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
 					writer.write(innerHTML);
@@ -432,7 +455,7 @@ public class Backup {
 				
 				for (int i = 0; i < 1000; i++) { ///이미지 다운로드가 아니라 첨부파일 다운로더
 					try {
-						System.out.print("[첨부파일] 블록 찾는 중...");
+						log.print("[첨부파일] 블록 찾는 중...");
 						
 						try {// 신파일 구파일 체크 | 신버전 티스토리에서 첨부한 첨부파일은 HTML 양식이 다르다.
 							attachment = driver.findElement(By.className("imageblock")); //구파일
@@ -442,20 +465,20 @@ public class Backup {
 							targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
 						}
 
-						System.out.println("완료");
+						log.println("완료");
 						
 					} catch (Exception e) {
-						System.out.println("블록 없음");
-						System.out.println("[첨부파일] 다운로드 완료 : " + i-- + "개");
+						log.println("블록 없음");
+						log.println("[첨부파일] 다운로드 완료 : " + i-- + "개");
 						break;
 					}
 					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
 					try {
-						System.out.print("[첨부파일] 하이퍼링크 찾는 중...");
+						log.print("[첨부파일] 하이퍼링크 찾는 중...");
 					attachment = attachment.findElement(By.tagName("a"));
-					System.out.println("완료");
-					System.out.println("[첨부파일] URL: "+attachment.getAttribute("href"));
-					System.out.println("[첨부파일] 파일명: "+attachment.getText());
+					log.println("완료");
+					log.println("[첨부파일] URL: "+attachment.getAttribute("href"));
+					log.println("[첨부파일] 파일명: "+attachment.getText());
 					
 					
 					//open getAttribute("href")
@@ -466,13 +489,13 @@ public class Backup {
 					
 					
 					
-					System.out.print("[첨부파일] "+delayFileDL+"ms 대기중...");
+					log.print("[첨부파일] "+delayFileDL+"ms 대기중...");
 					try {
 						Thread.sleep(delayFileDL);
 					} catch (InterruptedException ee) {// 다운로드
 					}
 					
-					System.out.println("완료");
+					log.println("완료");
 					
 					
 					
@@ -485,14 +508,14 @@ public class Backup {
 			        {
 			            //폴더의 내용물 확인 -> 폴더 & 파일..
 			            File[] fileNames = original_dir.listFiles();    //내용 목록 반환
-			             //System.out.println("--------------폴더 읽기-----------------");
+			             //log.println("--------------폴더 읽기-----------------");
 			            //for(int i=0; i< fileNames.length; i++) {
 			                //if(fileNames[i].isDirectory()) {
-			                    //System.out.println(fileNames[i].getName()); //폴더 존재 유무
+			                    //log.println(fileNames[i].getName()); //폴더 존재 유무
 			                //}
 			            //}
 			 
-			            System.out.print("[첨부파일] 파일 복사 중...");
+			            log.print("[첨부파일] 파일 복사 중...");
 			 
 			            for(int ii=0; ii< fileNames.length; ii++) {
 			                if(fileNames[ii].isFile()) {
@@ -503,13 +526,13 @@ public class Backup {
 			      }
 			      File MoveFile = new File(move_dir, fileNames[ii].getName()); // 이동될 파일 경로 및 파일 이름
 			      fileNames[ii].renameTo(MoveFile);   //변경(이동)
-			      System.out.println(fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
+			      log.println(fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
 			      fileNames[ii].delete();
 			     }
 			                }
 			            }
 			        }
-					System.out.println("완료");
+					log.println("완료");
 					
 					
 					
@@ -530,20 +553,20 @@ public class Backup {
 					
 					
 					
-					System.out.println("[첨부파일] href저장완료");
+					log.println("[첨부파일] href저장완료");
 					js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.className(targetBlock)));
-					System.out.println("[첨부파일] href삭제완료");
+					log.println("[첨부파일] href삭제완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
-					System.out.println("없음");
+					log.println("없음");
 					
 					try {
-						//System.out.println("href 없당"+e);
+						//log.println("href 없당"+e);
 						js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 								driver.findElement(By.className(targetBlock)));
-						System.out.println("[첨부파일] 쓸모없는 블록 삭제완료");
+						log.println("[첨부파일] 쓸모없는 블록 삭제완료");
 					} catch (Exception e2) {
-						System.out.println("[첨부파일] 쓸모없는 블록 삭제실패: "+e);
+						log.println("[첨부파일] 쓸모없는 블록 삭제실패: "+e);
 					}
 					}	//imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기 end				
 					
@@ -557,7 +580,7 @@ public class Backup {
 		} catch (Exception e) {
 
 			e.printStackTrace();
-			System.out.println(e);
+			log.println(e);
 			try {
 				Thread.sleep(10000);
 			} catch (InterruptedException ee) {
