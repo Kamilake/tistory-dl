@@ -45,10 +45,10 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 228;
+	static int pageNum = 0;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "hongmeilin";
 	
 	/** 암호걸린 게시글의 암호 */
 	static String password = "1111";
@@ -67,9 +67,9 @@ public class Backup {
 	// String pageTitle = new String();
 	// String[] imgTitle = new String[1000];
 	String[] imgURL = new String[1000];
+	/** 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다. */
+	String[] imageRealname = new String[1000];
 	
-	
-
 	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
 		// String blogName = "testblog2";
@@ -129,29 +129,35 @@ public class Backup {
 			int byteRead;
 			int byteWritten = 0;
 			Url = new URL(fileAddress);
-			outStream = new BufferedOutputStream(new FileOutputStream(downloadDir + "\\" + localFileName));
+
 			uCon = Url.openConnection();
-			//파일이름찾는 부분 시작 @@@@티스토리에선 헤더에 파일 이름을 넣지 않는다. 즉 실패. 하지만 첨부파일 다운로드에선 빛을 보일 수 있을지도? 아직 테스트해보지 않았다.@@@@
-//			uCon.connect();
-//			String extension_raw = uCon.getHeaderField("Content-Disposition");
-//			// raw = "attachment; filename=abc.jpg"
-//			log.println(extension_raw);
-//			if(extension_raw != null && extension_raw.indexOf("=") != -1) {
-//			    String fileName = extension_raw.split("=")[1]; //getting value after '='
-//			    log.println("[파일] 원본 파일 이름 :" + fileName);
-//			    fileName = extension_raw.split(".")[1]; //getting value after '.'
-//			    log.println("[파일] 원본 파일 확장자 :" + fileName);
-//			} else {
-//			    // fall back to random generated file name?
-//			}
-			//이 주석 기준 윗부분: 헤더에서 이름 추출 / 아랫부분: URL에서 이름 추출
+			//파일이름찾는 부분 시작 @@@@신버전 티스토리에선 헤더에 파일 이름을 넣지 않는다. 즉 실패. 하지만 첨부파일 다운로드에선 빛을 보일 수 있을지도? 아직 테스트해보지 않았다.@@@@
+			uCon.connect();
+			String extension_raw = uCon.getHeaderField("Content-Disposition");
 			
-			
-			
-			
-			
+			//헤더예시 --> Content-Disposition: inline; filename="008.png"; filename*=UTF-8''008.png
+			// raw = "attachment; filename=abc.jpg"
+			log.println(extension_raw);
+			if(extension_raw != null && extension_raw.indexOf("filename=\"") != -1) {
+			    String netFileName = extension_raw.split("filename=\"")[1]; //getting value after '='
+			    netFileName = netFileName.split("\"")[0];
+			    log.println("[파일] 원본 파일 이름 : " + netFileName);
+//			    netFileName = netFileName.split("\\.")[1]; //getting value after '.'
+//			    log.println("[파일] 원본 파일 확장자 : " + netFileName);
+			    localFileName=localFileName+"_"+netFileName;
+			} else {
+			    // fall back to random generated file name?
+				//URL에서 확장자 찾아오는 부분이 이곳에 추가되어야 한다.
+				localFileName=localFileName+".jpg";
+			}
 			
 			//파일이름찾는 부분 끝
+			outStream = new BufferedOutputStream(new FileOutputStream(downloadDir + "\\" + localFileName));
+			
+			
+			
+			
+
 
 			is = uCon.getInputStream();
 			buf = new byte[size];
@@ -421,8 +427,8 @@ public class Backup {
 
 						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
 							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-							log.println("[사진] 이미지 중복 발견 : img" + i + ".jpg는 img" + j + ".jpg와 같기 때문에 img" + j
-									+ ".jpg파일로 통합하고 링크를 연결합니다.");
+							log.println("[사진] 이미지 중복 발견 : img" + i + " 파일은 img" + j + " 파일과 같기 때문에 img" + j
+									+ " 파일로 통합하고 링크를 연결합니다.");
 							break;
 						}
 					}
@@ -442,7 +448,7 @@ public class Backup {
 						} else
 							log.println("[사진] 유형: 원본 이미지");
 
-						fileUrlReadAndDownload(HiResURL, "img" + imgNum + ".jpg", saveDir(pageNum));
+						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum));
 
 					} catch (Exception e) {
 						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
@@ -459,7 +465,12 @@ public class Backup {
 					innerHTML = innerHTML.replaceAll("srcset=", "alt="); // 크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
 					// for (int ii = 0; ii < 1000; ii++)
 					try {
+						//innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
+						
+						
 						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
+						
+						//imageRealname
 						//log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
 					} catch (Exception e) {
 						log.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
