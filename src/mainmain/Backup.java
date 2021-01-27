@@ -31,7 +31,7 @@ public class Backup {
 	Log log = new Log();
 	
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
-	static int delay = 2700; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
+	static int delay = 2100; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = "A:/Tistory/"; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
@@ -41,10 +41,10 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 276;
+	static int pageNum = 0;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "oogundam";
 	
 	/** 암호걸린 게시글의 암호 */
 	static String password = "1111";
@@ -57,7 +57,7 @@ public class Backup {
 	
 	
 	
-	
+	//TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
 	// String blogTitle = new String();
 	//static String blogName = new String();
 	// String pageTitle = new String();
@@ -143,6 +143,9 @@ public class Backup {
 			} else {
 			    // fall back to random generated file name?
 				localFileName=localFileName+"_"+fileAddress.substring(fileAddress.lastIndexOf("/")+1);
+				if(localFileName != null && localFileName.indexOf("?") != -1) //물음표(GET쿼리)가 있으면 Windows에서 파일 저장 불가능(파일 이름, 디렉터리 이름 또는 볼륨 레이블 구문이 잘못되었습니다) 오류 발생.
+					localFileName = localFileName.split("\\?")[0]; //img9_zip.gif?_version_=tistory-aa685cac6411243b8334d0c6f53f8d458177bada
+				
 				//TODO: 저 URL 끝이 이미지 확장자가 맞는지(jpg png gif heic 등등) 확인해야 한다.
 				//localFileName=localFileName+".jpg";
 			}
