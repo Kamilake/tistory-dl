@@ -44,7 +44,7 @@ public class Backup {
 	static int pageNum = 0;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "oogundam";
+	static String blogName = "bxmpe";
 	
 	/** 암호걸린 게시글의 암호 */
 	static String password = "1111";
