@@ -41,12 +41,12 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 0;
+	static int pageNum = 482;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "nx0084";
 	
-	/** 암호걸린 게시글의 암호 */
+	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -514,19 +514,10 @@ public class Backup {
 					log.println("완료");
 					log.println("[첨부파일] URL: "+attachment.getAttribute("href"));
 					log.println("[첨부파일] 파일명: "+attachment.getText());
-					
-					
-					//open getAttribute("href")
-					driver.navigate().to(attachment.getAttribute("href"));
-					//filemoving
-					
-					
-					
-					
-					
+					driver.navigate().to(attachment.getAttribute("href")); //파일 새 탭으로 열기
 					log.print("[첨부파일] "+delayFileDL+"ms 대기중...");
 					try {
-						Thread.sleep(delayFileDL);
+						Thread.sleep(delayFileDL); //다운완료까지 대기
 					} catch (InterruptedException ee) {// 다운로드
 					}
 					
@@ -588,10 +579,10 @@ public class Backup {
 					
 					
 					
-					log.println("[첨부파일] href저장완료");
+					log.println("[첨부파일] 링크 저장 완료");
 					js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.className(targetBlock)));
-					log.println("[첨부파일] href삭제완료");
+					log.println("[첨부파일] 저장한 링크 삭제 완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
 					log.println("없음");
 					
@@ -601,7 +592,8 @@ public class Backup {
 								driver.findElement(By.className(targetBlock)));
 						log.println("[첨부파일] 쓸모없는 블록 삭제완료");
 					} catch (Exception e2) {
-						log.println("[첨부파일] 쓸모없는 블록 삭제실패: "+e);
+						log.println("[첨부파일] 쓸모없는 블록 삭제실패: ");
+						e2.printStackTrace();
 					}
 					}	//imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기 end				
 					
