@@ -19,5 +19,47 @@ public class Save {
 			folder.mkdir();
 		return path;
 	}
+
+
+	/** 파일 이동. 주로 임시 저장공간의 파일을 영구적인 위치로 옮길 때 사용합니다. @
+	 * 
+	 * @param 원본
+	 * @param 대상
+	 * @return
+	 */
+	public String moveFile(File original_dir,File move_dir)
+    {
+		Log log = new Log();
+
+		if(original_dir.exists())
+		{
+			//폴더의 내용물 확인 -> 폴더 & 파일..
+			File[] fileNames = original_dir.listFiles();    //내용 목록 반환
+			 //log.println("--------------폴더 읽기-----------------");
+			//for(int i=0; i< fileNames.length; i++) {
+				//if(fileNames[i].isDirectory()) {
+					//log.println(fileNames[i].getName()); //폴더 존재 유무
+				//}
+			//}
+ 
+			log.print("[첨부파일] 파일 복사 중...");
+ 
+			for(int ii=0; ii< fileNames.length; ii++) {
+				if(fileNames[ii].isFile()) {
+					if(fileNames[ii].exists())
+					{
+					 if(original_dir.exists()){}
+					 File MoveFile = new File(move_dir, fileNames[ii].getName()); // 이동될 파일 경로 및 파일 이름
+					 fileNames[ii].renameTo(MoveFile);   //변경(이동)
+					 log.println(fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
+					 fileNames[ii].delete();
+					}
+				}
+			}
+		}
+		log.println("완료");
+		return "";
+        
+    }
     
 }

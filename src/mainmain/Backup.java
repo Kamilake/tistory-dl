@@ -39,10 +39,10 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 104;
+	static int pageNum = 316;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "myskrpatch";
+	static String blogName = "bxmpe";
 	
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
@@ -483,7 +483,7 @@ public class Backup {
 								targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
 								log.println("완료 (Tistory New)");
 							} catch (Exception e2) {
-								attachment = driver.findElement(By.tagName("figure")); //구글드라이브
+								attachment = driver.findElement(By.tagName("figure123123123123123123")); //구글드라이브
 								targetBlock = "googledrive"; //주의! : 클래스가 아님
 								log.println("완료 (Drive)");
 							}
@@ -510,44 +510,15 @@ public class Backup {
 					}
 					
 					log.println("완료");
+					//폴더 참조
 					
 					
 					
-					
-					 //폴더 참조
-			        File original_dir = new File((myDir+"DownloadTemp").replace("/","\\"));
-			        File move_dir = new File((save.saveDir(pageNum)).replace("/","\\"));
-			 
-			        if(original_dir.exists())
-			        {
-			            //폴더의 내용물 확인 -> 폴더 & 파일..
-			            File[] fileNames = original_dir.listFiles();    //내용 목록 반환
-			             //log.println("--------------폴더 읽기-----------------");
-			            //for(int i=0; i< fileNames.length; i++) {
-			                //if(fileNames[i].isDirectory()) {
-			                    //log.println(fileNames[i].getName()); //폴더 존재 유무
-			                //}
-			            //}
-			 
-			            log.print("[첨부파일] 파일 복사 중...");
-			 
-			            for(int ii=0; ii< fileNames.length; ii++) {
-			                if(fileNames[ii].isFile()) {
-			     if(fileNames[ii].exists())
-			     {
-			      if(original_dir.exists())
-			      {
-			      }
-			      File MoveFile = new File(move_dir, fileNames[ii].getName()); // 이동될 파일 경로 및 파일 이름
-			      fileNames[ii].renameTo(MoveFile);   //변경(이동)
-			      log.println(fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
-			      fileNames[ii].delete();
-			     }
-			                }
-			            }
-			        }
-					log.println("완료");
-
+					 //파일 이동
+			        File tempDir = new File((myDir+"DownloadTemp").replace("/","\\"));
+			        File permanentDir = new File((save.saveDir(pageNum)).replace("/","\\"));
+					save.moveFile(tempDir, permanentDir);
+			       
 					
 					
 					log.println("[첨부파일] 링크 저장 완료");
