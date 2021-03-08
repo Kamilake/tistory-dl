@@ -39,10 +39,10 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 482;
+	static int pageNum = 104;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "nx0084";
+	static String blogName = "myskrpatch";
 	
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
@@ -436,6 +436,7 @@ public class Backup {
 							log.println("[사진] 유형: Tistory 구서버 원본");
 						} else
 							log.println("[사진] 유형: 화면에 보이는 이미지");
+							//TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
 
 						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum), imgNum);
 
@@ -494,9 +495,16 @@ public class Backup {
 							targetBlock = "imageblock"; //구파일이면 타겟을 구파일로 설정
 							log.println("완료 (Tistory Old)");
 						} catch (Exception e) {
-							attachment = driver.findElement(By.className("fileblock")); //신파일
-							targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
-							log.println("완료 (Tistory New)");
+							try {
+								attachment = driver.findElement(By.className("fileblock")); //신파일
+								targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
+								log.println("완료 (Tistory New)");
+							} catch (Exception e2) {
+								attachment = driver.findElement(By.tagName("figure")); //구글드라이브
+								targetBlock = "googledrive"; //주의! : 클래스가 아님
+								log.println("완료 (Drive)");
+							}
+
 						}
 						
 					} catch (Exception e) {
@@ -524,7 +532,7 @@ public class Backup {
 					
 					
 					 //폴더 참조
-			        File original_dir = new File((myDir+"DownloadTemp").replace("/","\\"));  //절대경로
+			        File original_dir = new File((myDir+"DownloadTemp").replace("/","\\"));
 			        File move_dir = new File((saveDir(pageNum)).replace("/","\\"));
 			 
 			        if(original_dir.exists())
@@ -565,7 +573,6 @@ public class Backup {
 					log.println("[첨부파일] 저장한 링크 삭제 완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
 					log.println("없음");
-					
 					try {
 						//log.println("href 없당"+e);
 						js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
