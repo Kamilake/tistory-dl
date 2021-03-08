@@ -58,23 +58,6 @@ public class Backup {
 	String[] imgURL = new String[1000];
 	/** 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다. */
 	public static String[] imageRealname = new String[1000];
-	
-	public static String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
-		// 추후에 blogurl에서 아이디 뽑아서 폴더명으로 지정
-		// String blogName = "testblog2";
-		
-		//String myDir = "";
-
-		String path = myDir + "Backup/" + blogName + "/" + pageNum;
-		File blogroot = new File(myDir + "Backup/" + blogName);
-		if (!blogroot.exists())
-			blogroot.mkdir();
-
-		File folder = new File(path);
-		if (!folder.exists())
-			folder.mkdir();
-		return path;
-	}
 
 	private static void copyFileUsingStream(File source, File dest) throws IOException {
 		InputStream is = null;
@@ -239,7 +222,7 @@ public class Backup {
 
 	public void crawl() {
 		
-
+		Save save = new Save();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		
@@ -340,7 +323,7 @@ public class Backup {
 				log.println("완료");
 				emptyPageCount = 0;
 				try {
-					OutputStream title = new FileOutputStream(saveDir(pageNum) + "/Title_Info.txt");
+					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Title_Info.txt");
 					WebElement titleElement;
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
@@ -373,7 +356,7 @@ public class Backup {
 				//log.println(saveDir(pageNum));
 				log.print("[메타데이터] HTML 다운로드...");
 				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-				File dest_scrFile = new File(saveDir(pageNum) + "/preview.jpg");
+				File dest_scrFile = new File(save.saveDir(pageNum) + "/preview.jpg");
 				copyFileUsingStream(scrFile, dest_scrFile);
 				// container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
 				log.println("완료");
@@ -438,7 +421,7 @@ public class Backup {
 							log.println("[사진] 유형: 화면에 보이는 이미지");
 							//TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
 
-						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum), imgNum);
+						fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
 
 					} catch (Exception e) {
 						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
@@ -468,7 +451,7 @@ public class Backup {
 					} catch (Exception e) {
 						log.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
 					}
-					BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
+					BufferedWriter writer = new BufferedWriter(new FileWriter(save.saveDir(pageNum) + "/index.html"));
 					writer.write(innerHTML);
 					writer.close();
 					
@@ -533,7 +516,7 @@ public class Backup {
 					
 					 //폴더 참조
 			        File original_dir = new File((myDir+"DownloadTemp").replace("/","\\"));
-			        File move_dir = new File((saveDir(pageNum)).replace("/","\\"));
+			        File move_dir = new File((save.saveDir(pageNum)).replace("/","\\"));
 			 
 			        if(original_dir.exists())
 			        {
