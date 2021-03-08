@@ -480,7 +480,11 @@ public class Backup {
 					//
 					//
 					//for (; true;); // 한개만 색인시 true
-				
+
+
+					///////////// 첨부파일 다운로드 영역 시작
+
+
 				for (int i = 0; i < 1000; i++) { ///이미지 다운로드가 아니라 첨부파일 다운로더
 					try {
 						log.print("[첨부파일] 블록 찾는 중...");
@@ -488,12 +492,12 @@ public class Backup {
 						try {// 신파일 구파일 체크 | 신버전 티스토리에서 첨부한 첨부파일은 HTML 양식이 다르다.
 							attachment = driver.findElement(By.className("imageblock")); //구파일
 							targetBlock = "imageblock"; //구파일이면 타겟을 구파일로 설정
+							log.println("완료 (Tistory Old)");
 						} catch (Exception e) {
 							attachment = driver.findElement(By.className("fileblock")); //신파일
 							targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
+							log.println("완료 (Tistory New)");
 						}
-
-						log.println("완료");
 						
 					} catch (Exception e) {
 						log.println("블록 없음");
@@ -552,24 +556,7 @@ public class Backup {
 			            }
 			        }
 					log.println("완료");
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
-					
+
 					
 					
 					log.println("[첨부파일] 링크 저장 완료");
@@ -592,7 +579,8 @@ public class Backup {
 					
 					
 				}// for (int i = 0; i < 1000; i++) /첨부파일 다운로드 닫기
-				
+
+				///////////// 첨부파일 다운로드 영역 종료
 				
 				
 			} // 블로그 게시글 하나를 색인하는 for문 닫기
