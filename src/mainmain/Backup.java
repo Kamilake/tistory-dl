@@ -13,8 +13,6 @@ import java.net.URL;
 import java.net.URLConnection;
 import java.util.HashMap;
 import java.util.Scanner;
-
-//https://gdtbgl93.tistory.com/154
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
@@ -51,12 +49,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	
-	
-	
-	
+
 	//TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
 	// String blogTitle = new String();
 	//static String blogName = new String();
@@ -143,7 +136,7 @@ public class Backup {
 			} else {
 			    // fall back to random generated file name?
 				localFileName=localFileName+"_"+fileAddress.substring(fileAddress.lastIndexOf("/")+1);
-				if(localFileName != null && localFileName.indexOf("?") != -1) //물음표(GET쿼리)가 있으면 Windows에서 파일 저장 불가능(파일 이름, 디렉터리 이름 또는 볼륨 레이블 구문이 잘못되었습니다) 오류 발생.
+				if(localFileName != null && localFileName.indexOf("?") != -1) //물음표(GET쿼리 등)가 있으면 Windows에서 파일 저장 불가능(파일 이름, 디렉터리 이름 또는 볼륨 레이블 구문이 잘못되었습니다) 오류 발생.
 					localFileName = localFileName.split("\\?")[0]; //img9_zip.gif?_version_=tistory-aa685cac6411243b8334d0c6f53f8d458177bada
 				
 				//TODO: 저 URL 끝이 이미지 확장자가 맞는지(jpg png gif heic 등등) 확인해야 한다.
@@ -357,7 +350,7 @@ public class Backup {
 					title.close();
 				} catch (Exception e) {
 					log.println("[제목] 예상했던 곳에 제목이 적혀있지 않습니다.\n 티스토리가 변경되었거나 이 프로그램에 문제가 있습니다.");
-					//todo: 파일 건너뛰었다는 로그 찍기
+					//TODO: 파일 건너뛰었다는 로그 찍기
 					log.print(""+(delay+1000)+"ms 대기중...");
 					try {
 						Thread.sleep(delay+1000);
@@ -382,7 +375,7 @@ public class Backup {
 				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				File dest_scrFile = new File(saveDir(pageNum) + "/preview.jpg");
 				copyFileUsingStream(scrFile, dest_scrFile);
-				// container_postbtn #post_button_group (좋아요 공감 버튼)삭제
+				// container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
 				log.println("완료");
 				
 				log.print("[메타데이터] 미리보기 이미지 생성...");
@@ -442,7 +435,7 @@ public class Backup {
 							HiResURL = HiResURL.replace("cfile", "http://cfile");
 							log.println("[사진] 유형: Tistory 구서버 원본");
 						} else
-							log.println("[사진] 유형: 원본 이미지");
+							log.println("[사진] 유형: 화면에 보이는 이미지");
 
 						fileUrlReadAndDownload(HiResURL, "img" + imgNum, saveDir(pageNum), imgNum);
 
