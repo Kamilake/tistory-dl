@@ -77,101 +77,16 @@ public class Backup {
 	}
 
 //////////////////////////////////////////////////////////////////////////////////////
-	/**
-	 * 버퍼 사이즈
-	 */
-	final static int size = 1024;
-
-	/**
-	 * fileAddress에서 파일을 읽어, 다운로드 디렉토리에 다운로드
-	 *
-	 * @param fileAddress
-	 * @param localFileName
-	 * @param downloadDir
-	 */
-	public static void fileUrlReadAndDownload(String fileAddress, String localFileName, String downloadDir,int imgNum) {
-		Log log = new Log();
-		OutputStream outStream = null;
-		URLConnection uCon = null;
-
-		InputStream is = null;
-		try {
-			URL Url;
-			byte[] buf;
-			int byteRead;
-			int byteWritten = 0;
-			Url = new URL(fileAddress);
-
-			uCon = Url.openConnection();
-			//파일이름찾는 부분 시작 @@@@신버전 티스토리에선 헤더에 파일 이름을 넣지 않는다. 즉 실패. 하지만 첨부파일 다운로드에선 빛을 보일 수 있을지도? 아직 테스트해보지 않았다.@@@@
-			uCon.connect();
-			String extension_raw = uCon.getHeaderField("Content-Disposition");
-			
-			//헤더예시 --> Content-Disposition: inline; filename="008.png"; filename*=UTF-8''008.png
-			// raw = "attachment; filename=abc.jpg"
-			if(extension_raw != null && extension_raw.indexOf("filename=\"") != -1) {
-			    String netFileName = extension_raw.split("filename=\"")[1]; //getting value after '='
-			    netFileName = netFileName.split("\"")[0];
-			    log.println("[파일] 원본 파일 이름 : " + netFileName);
-//			    netFileName = netFileName.split("\\.")[1]; //getting value after '.'
-//			    log.println("[파일] 원본 파일 확장자 : " + netFileName);
-			    localFileName=localFileName+"_"+netFileName;
-			} else {
-			    // fall back to random generated file name?
-				localFileName=localFileName+"_"+fileAddress.substring(fileAddress.lastIndexOf("/")+1);
-				if(localFileName != null && localFileName.indexOf("?") != -1) //물음표(GET쿼리 등)가 있으면 Windows에서 파일 저장 불가능(파일 이름, 디렉터리 이름 또는 볼륨 레이블 구문이 잘못되었습니다) 오류 발생.
-					localFileName = localFileName.split("\\?")[0]; //img9_zip.gif?_version_=tistory-aa685cac6411243b8334d0c6f53f8d458177bada
-				
-				//TODO: 저 URL 끝이 이미지 확장자가 맞는지(jpg png gif heic 등등) 확인해야 한다.
-				//localFileName=localFileName+".jpg";
-			}
-			
-			//파일이름찾는 부분 끝
-			outStream = new BufferedOutputStream(new FileOutputStream(downloadDir + "\\" + localFileName));
-			imageRealname[imgNum] = localFileName; //전역으로 이미지 이름을 저장. 추후 html에서 링크를 치환할 때 사용된다.
-			
-			
-
-
-			is = uCon.getInputStream();
-			buf = new byte[size];
-			while ((byteRead = is.read(buf)) != -1) {
-				outStream.write(buf, 0, byteRead);
-				byteWritten += byteRead;
-			}
-			log.println("[사진] 주소 :" + fileAddress);
-			log.println("[사진] 이름 : " + localFileName);
-			log.println("[사진] 크기 : " + byteWritten + "바이트");
-			log.println("[사진] 다운로드 완료");
-
-		} catch (Exception e) {
-			e.printStackTrace();
-		} finally {
-			try {
-				is.close();
-				outStream.close();
-			} catch (IOException e) {
-				e.printStackTrace();
-			}
-
-		}
-	}
-
-	/**
-	 *
-	 * @param fileAddress
-	 * @param downloadDir
-	 */
 
 	public static void main(String[] args) {////////// MAIN
 		Log log = new Log();
 		log.println("참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
 		log.println("참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
 		log.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
-		log.println("참고: 지금은 블로그 본문 HTML 텍스트와 사진만 백업이 가능합니다.");
+		log.println("참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 
-		log.println("\nHyper Tistory Backup v1.1.2-alpha  -  Kamilake.com\n");
+		log.println("\nHyper Tistory Backup v0.2-alpha  -  Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
@@ -223,6 +138,7 @@ public class Backup {
 	public void crawl() {
 		
 		Save save = new Save();
+		Download dl = new Download();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		
@@ -233,8 +149,8 @@ public class Backup {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
 			System.in.read();
-			
-			int emptyPageCount = 0; // 빈 페이지 계산 후 일정량이 넘어가면 크롤링 종료
+			/** 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다. */
+			int emptyPageCount = 0; 
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
 				log.println("검색중인 페이지 : " + pageNum);
@@ -279,7 +195,7 @@ public class Backup {
 							}
 							} else {
 
-								// if(과도트래픽 조건 확인) 과도트래픽이면 대기
+								//TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
 								log.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 								System.in.read();
 							}
@@ -421,7 +337,7 @@ public class Backup {
 							log.println("[사진] 유형: 화면에 보이는 이미지");
 							//TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
 
-						fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
+						dl.fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
 
 					} catch (Exception e) {
 						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);

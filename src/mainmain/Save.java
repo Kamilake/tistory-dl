@@ -51,7 +51,7 @@ public class Save {
 					 if(original_dir.exists()){}
 					 File MoveFile = new File(move_dir, fileNames[ii].getName()); // 이동될 파일 경로 및 파일 이름
 					 fileNames[ii].renameTo(MoveFile);   //변경(이동)
-					 log.println(fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
+					 log.println("[첨부파일]" + fileNames[ii].getName()); // 폴더내에 있는 파일 리스트
 					 fileNames[ii].delete();
 					}
 				}
