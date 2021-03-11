@@ -386,6 +386,8 @@ public class Backup {
 
 
 				for (int i = 0; i < 1000; i++) { ///이미지 다운로드가 아니라 첨부파일 다운로더
+					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
+
 					try {
 						log.print("[첨부파일] 블록 찾는 중...");
 						
@@ -411,9 +413,10 @@ public class Backup {
 						log.println("[첨부파일] 다운로드 완료 : " + i-- + "개");
 						break;
 					}
-					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
+
+					
 					try {
-						log.print("[첨부파일] 하이퍼링크 찾는 중...");
+					log.print("[첨부파일] 하이퍼링크 찾는 중...");
 					attachment = attachment.findElement(By.tagName("a"));
 					log.println("완료");
 					log.println("[첨부파일] URL: "+attachment.getAttribute("href"));
@@ -425,24 +428,29 @@ public class Backup {
 					} catch (InterruptedException ee) {// 다운로드
 					}
 					
+
+
 					log.println("완료");
 					//폴더 참조
 					
 					
 					
 					 //파일 이동
+					log.println("[첨부파일] 파일 이동 시작");
 			        File tempDir = new File((myDir+"DownloadTemp").replace("/","\\"));
 			        File permanentDir = new File((save.saveDir(pageNum)).replace("/","\\"));
 					save.moveFile(tempDir, permanentDir);
-			       
+					log.println("[첨부파일] 파일 이동 완료");
 					
 					
-					log.println("[첨부파일] 링크 저장 완료");
+					
+					
 					js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.className(targetBlock)));
 					log.println("[첨부파일] 저장한 링크 삭제 완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
 					log.println("없음");
+					e.printStackTrace();
 					try {
 						//log.println("href 없당"+e);
 						js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
