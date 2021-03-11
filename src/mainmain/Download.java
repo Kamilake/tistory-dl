@@ -12,7 +12,7 @@ import java.io.FileOutputStream;
 
 import static mainmain.Backup.imageRealname;
 
-
+/** 블로그에 */
 public class Download {
 
 
