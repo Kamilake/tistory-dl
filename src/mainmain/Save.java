@@ -3,7 +3,12 @@ import java.io.File;
 import static mainmain.Backup.myDir;
 import static mainmain.Backup.blogName;
 
+/** 버퍼 또는 캐시에 저장된 데이터를 디스크에 영구적으로 저장하는 것과 관련된 정보를 저장하고 있습니다. */
 public class Save {
+
+
+
+
 	/** 페이지 번호를 주면 전체 절대경로를 반환합니다. @param 페이지번호 */
     public String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// String blogName = "testblog2";
@@ -41,9 +46,7 @@ public class Save {
 					//log.println(fileNames[i].getName()); //폴더 존재 유무
 				//}
 			//}
- 
-			log.print("[첨부파일] 파일 복사 중...");
- 
+  
 			for(int ii=0; ii< fileNames.length; ii++) {
 				if(fileNames[ii].isFile()) {
 					if(fileNames[ii].exists())
@@ -57,7 +60,6 @@ public class Save {
 				}
 			}
 		}
-		log.println("완료");
 		return "";
         
     }
