@@ -138,9 +138,7 @@ public class Backup {
 		Download dl = new Download();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
-		
 		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문 
-		
 		
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
