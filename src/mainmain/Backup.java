@@ -36,10 +36,10 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 316;
+	static int pageNum = 100;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "myskrpatch";
 	
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
@@ -113,7 +113,7 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--window-size=1500,4000");
+		options.addArguments("--window-size=1000,4000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		
 		String downloadFilepath = (myDir+"DownloadTemp").replace("/","\\");
@@ -245,6 +245,7 @@ public class Backup {
 				} catch (Exception e) {
 					log.println("[제목] 예상했던 곳에 제목이 적혀있지 않습니다.\n 티스토리가 변경되었거나 이 프로그램에 문제가 있습니다.");
 					//TODO: 파일 건너뛰었다는 로그 찍기
+					e.printStackTrace();
 					log.print(""+(delay+1000)+"ms 대기중...");
 					try {
 						Thread.sleep(delay+1000);
