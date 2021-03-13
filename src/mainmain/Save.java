@@ -29,6 +29,28 @@ public class Save {
 		}
 		return path;
 	}
+	
+//deprecated 더 이상 사용되지 않음.
+	// private static void copyFileUsingStream(File source, File dest) throws IOException {
+	// 	InputStream is = null;
+	// 	OutputStream os = null;
+	// 	try {
+	// 		is = new FileInputStream(source);
+	// 		os = new FileOutputStream(dest);
+	// 		byte[] buffer = new byte[1024];
+	// 		int length;
+	// 		while ((length = is.read(buffer)) > 0) {
+	// 			os.write(buffer, 0, length);
+	// 		}
+	// 	} finally {
+	// 		is.close();
+	// 		os.close();
+	// 	}
+	// }
+
+
+
+
 
 	/**
 	 * 파일 이동. 주로 임시 저장공간의 파일을 영구적인 위치로 옮길 때 사용합니다. @

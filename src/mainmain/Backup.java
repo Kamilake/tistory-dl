@@ -2,19 +2,22 @@ package mainmain;
 
 import java.io.BufferedWriter;
 import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
-import java.io.IOException;
-import java.io.InputStream;
 import java.io.OutputStream;
 import java.util.HashMap;
 import java.util.Scanner;
+
+import javax.imageio.ImageIO;
+import javax.imageio.ImageWriteParam;
+import javax.imageio.IIOImage;
+import javax.imageio.ImageWriter;
+import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
+import javax.imageio.stream.FileImageOutputStream;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.openqa.selenium.Keys;
-import org.openqa.selenium.OutputType;
-import org.openqa.selenium.TakesScreenshot;
 import org.openqa.selenium.WebDriver;
 import org.openqa.selenium.WebElement;
 import org.openqa.selenium.chrome.ChromeDriver;
@@ -22,13 +25,17 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 
+import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
+import ru.yandex.qatools.ashot.AShot;
+import ru.yandex.qatools.ashot.Screenshot;
+
+
 public class Backup {
-	Log log = new Log();
-	
+	Log log = new Log();	
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
-	static String myDir = "A:/Tistory/"; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
+	static String myDir = ""/*"A:/Tistory/"*/; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
 
@@ -56,22 +63,7 @@ public class Backup {
 	/** 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다. */
 	public static String[] imageRealname = new String[1000];
 
-	private static void copyFileUsingStream(File source, File dest) throws IOException {
-		InputStream is = null;
-		OutputStream os = null;
-		try {
-			is = new FileInputStream(source);
-			os = new FileOutputStream(dest);
-			byte[] buffer = new byte[1024];
-			int length;
-			while ((length = is.read(buffer)) > 0) {
-				os.write(buffer, 0, length);
-			}
-		} finally {
-			is.close();
-			os.close();
-		}
-	}
+
 
 //////////////////////////////////////////////////////////////////////////////////////
 
@@ -277,15 +269,44 @@ public class Backup {
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
 				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
-//				innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
-//						"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
-//				innerHTML = innerHTML.replaceAll("srcset=", "alt=");
-//				for (int i = 0; i < 1000; i++)
-//					innerHTML = innerHTML.replaceFirst("이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다", "img" + i + ".jpg");
-//
-//				BufferedWriter writer = new BufferedWriter(new FileWriter(saveDir(pageNum) + "/index.html"));
-//				writer.write(innerHTML);
-//				writer.close();
+
+				// isDisplayed();
+				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
+				// 모바일상단바.isDisplayed();
+
+				JavascriptExecutor js_모바일상단바삭제 = (JavascriptExecutor) driver;
+				js_모바일상단바삭제.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+						driver.findElement(By.className("kakao_head")));
+				js_모바일상단바삭제.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+						driver.findElement(By.className("blogview_head")));
+
+
+
+
+
+
+				Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting
+				(10)).takeScreenshot(driver);
+
+
+				final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
+				// specifies where the jpg image has to be written
+				imgwriter.setOutput(new FileImageOutputStream(
+						new File(save.saveDir(pageNum)+"/"+"Thumbnail.jpg")));
+				
+
+						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+						jpegParams.setCompressionQuality(0.3f); //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
+
+				// writes the file with given compression level 
+				// from your JPEGImageWriteParam instance
+				imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams);
+				
+
+
+
+				//원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new File(".\\fullimage.webp"));
 				//
 				//
 				//
