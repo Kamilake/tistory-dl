@@ -12,10 +12,8 @@ import java.io.FileOutputStream;
 
 import static mainmain.Backup.imageRealname;
 
-/** 블로그에 */
+/** 블로그 또는 인터넷의 데이터를 로컬로 다운로드하는 기능들이 모여 있습니다.*/
 public class Download {
-
-
 
     String humanReadableByteCountSI(long bytes) {
         if (-1000 < bytes && bytes < 1000) {
