@@ -26,7 +26,7 @@ public class Backup {
 	Log log = new Log();
 	
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
-	static int delay = 2100; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
+	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = "A:/Tistory/"; // 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
@@ -266,17 +266,16 @@ public class Backup {
 				//
 				//
 				//log.println(saveDir(pageNum));
-				log.print("[메타데이터] HTML 다운로드...");
-				File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
-				File dest_scrFile = new File(save.saveDir(pageNum) + "/preview.jpg");
-				copyFileUsingStream(scrFile, dest_scrFile);
-				// container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
-				log.println("완료");
+				//log.print("[메타데이터] HTML 다운로드...");
+				// File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
+				// File dest_scrFile = new File(save.saveDir(pageNum) + "/preview.jpg");
+				// copyFileUsingStream(scrFile, dest_scrFile);
+				// // container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
+				//log.println("완료");
 				
-				log.print("[메타데이터] 미리보기 이미지 생성...");
+				log.print("[메타데이터] 섬네일 생성...");
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
-
 				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
 //				innerHTML = innerHTML.replaceAll("(img src=\")(.*?)(\" )",
 //						"img src=\"이_문자열은_이미지_주소가_치환되기_전_임시_저장되는_문자열입니다\" ");
@@ -352,7 +351,7 @@ public class Backup {
 					try {
 						//innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
 						
-						
+						innerHTML = innerHTML.replace("src=\"//","src=\"https://"); //myskrpatch를 보니까 주소가 <img src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
 						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], imageRealname[imgNum]);
 						log.println("교체대상 : "+imgURL[imgNum]);
 						log.println("교체전주소 : "+"img" + imgNum + ".jpg");
@@ -363,24 +362,21 @@ public class Backup {
 					} catch (Exception e) {
 						log.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
 					}
+
+					log.print("[메타데이터] HTML 다운로드...");
 					BufferedWriter writer = new BufferedWriter(new FileWriter(save.saveDir(pageNum) + "/index.html"));
 					writer.write(innerHTML);
 					writer.close();
-					
+					log.println("완료");
 					
 				} // for (int i = 0; i < 1000; i++) } 이미지검색기 종료
-					//
-					//
-					//
-					//
-					//
-					//
-					//for (; true;); // 한개만 색인시 true
+
+
+
+
 
 
 					///////////// 첨부파일 다운로드 영역 시작
-
-
 				for (int i = 0; i < 1000; i++) { ///이미지 다운로드가 아니라 첨부파일 다운로더
 					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
 
@@ -446,7 +442,7 @@ public class Backup {
 					log.println("[첨부파일] 저장한 링크 삭제 완료");
 					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
 					log.println("없음");
-					e.printStackTrace();
+					//e.printStackTrace();
 					try {
 						//log.println("href 없당"+e);
 						js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
