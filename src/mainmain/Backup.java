@@ -45,13 +45,15 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 24;
+	static int pageNum = 0;
 	
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
 	
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
+
+	float jpegParams_setCompressionQuality = 0.3f; //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
@@ -300,7 +302,7 @@ public class Backup {
 
 						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-						jpegParams.setCompressionQuality(0.3f); //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
+						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
 
 				// writes the file with given compression level 
 				// from your JPEGImageWriteParam instance
