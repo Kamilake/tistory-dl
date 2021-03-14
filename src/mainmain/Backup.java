@@ -32,10 +32,12 @@ import ru.yandex.qatools.ashot.Screenshot;
 
 public class Backup {
 	Log log = new Log();	
+
+	static String Version = "2021.03.14"; // 버전
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
-	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
+	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
 
@@ -75,7 +77,7 @@ public class Backup {
 		log.println("참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 
-		log.println("\nHyper Tistory Backup v0.2-alpha  -  Kamilake.com\n");
+		log.println("\nHyper Tistory Backupper "+Version+" - blog.Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
@@ -226,12 +228,13 @@ public class Backup {
 				log.println("완료");
 				emptyPageCount = 0;
 				try {
-					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Title_Info.txt");
+					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Metadata.txt");
 					WebElement titleElement;
+					String metaData = "HTB " + Version;
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
-					byte[] by = titleElement.getText().getBytes();
+					byte[] by = (titleElement.getText()+"\n\n---\n\n"+metaData).getBytes();
 					title.write(by);
 					title.close();
 				} catch (Exception e) {
@@ -376,7 +379,7 @@ public class Backup {
 						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], imageRealname[imgNum]);
 						log.println("교체대상 : "+imgURL[imgNum]);
 						log.println("교체전주소 : "+"img" + imgNum + ".jpg");
-						log.println("교체후주소 : "+imageRealname[imgNum]);
+						log.println("교체후주소 : "+imageRealname[imgNum]); //TODO: 이미지이름 한글일때 제대로 안나온다 시놀 도커 마크서버 참고
 						
 						//imageRealname
 						//log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
