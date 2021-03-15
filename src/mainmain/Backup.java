@@ -29,9 +29,8 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 
-
 public class Backup {
-	Log log = new Log();	
+	Log log = new Log();
 
 	static String Version = "2021.03.14"; // 버전
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
@@ -46,30 +45,30 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
 	static int pageNum = 0;
-	
+
 	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
-	
+
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
-	float jpegParams_setCompressionQuality = 0.3f; //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
+	float jpegParams_setCompressionQuality = 0.3f; // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
-	//TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
+	// TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
 	// String blogTitle = new String();
-	//static String blogName = new String();
+	// static String blogName = new String();
 	// String pageTitle = new String();
 	// String[] imgTitle = new String[1000];
 	String[] imgURL = new String[1000];
-	/** 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다. */
+	/**
+	 * 원래 img숫자.jpg로 파일을 관리했는데 실 파일명으로 저장하면서 이미지 링크 치환할 때 기존 저장한 파일명을 보존할 필요가 생겼다.
+	 */
 	public static String[] imageRealname = new String[1000];
 
-
-
-//////////////////////////////////////////////////////////////////////////////////////
+	//////////////////////////////////////////////////////////////////////////////////////
 
 	public static void main(String[] args) {////////// MAIN
 		Log log = new Log();
@@ -79,13 +78,14 @@ public class Backup {
 		log.println("참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 
-		log.println("\nHyper Tistory Backupper "+Version+" - blog.Kamilake.com\n");
+		log.println("\nHyper Tistory Backupper " + Version + " - blog.Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
-		if(blogName.equals("")) {
-		blogName = scan.nextLine();
-		} else log.println(blogName);
+		if (blogName.equals("")) {
+			blogName = scan.nextLine();
+		} else
+			log.println(blogName);
 		Backup backup = new Backup();
 		backup.crawl();
 		scan.close();
@@ -95,11 +95,10 @@ public class Backup {
 	public static WebDriver driver;
 
 	public WebElement imageClass;
-	public WebElement attachment; //첨부파일
+	public WebElement attachment; // 첨부파일
 	public WebElement blogView;
 
 	// Properties
-	
 
 	// private String base_url = "https://papago.naver.com/?sk=ja";
 
@@ -111,8 +110,8 @@ public class Backup {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--window-size=1000,4000");
 		options.setCapability("ignoreProtectedModeSettings", true);
-		
-		String downloadFilepath = (myDir+"DownloadTemp").replace("/","\\");
+
+		String downloadFilepath = (myDir + "DownloadTemp").replace("/", "\\");
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		chromePrefs.put("download.default_directory", downloadFilepath);
@@ -122,26 +121,26 @@ public class Backup {
 		cap.setCapability(ChromeOptions.CAPABILITY, options);
 		driver = new ChromeDriver(cap);
 
-		
-		
-		//driver = new ChromeDriver(options);
+		// driver = new ChromeDriver(options);
 
 	}
 
 	public void crawl() {
-		
+
 		Save save = new Save();
 		Download dl = new Download();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
-		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문 
-		
+		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문
+
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
 			System.in.read();
-			/** 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다. */
-			int emptyPageCount = 0; 
+			/**
+			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
+			 */
+			int emptyPageCount = 0;
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
 				log.println("검색중인 페이지 : " + pageNum);
@@ -149,7 +148,6 @@ public class Backup {
 				// liveBtn = driver.findElement(By.id("txtSource"));
 				// liveBtn.click();
 				// driver.navigate().to("https://naver.com/");
-				
 
 				//
 				//
@@ -159,73 +157,67 @@ public class Backup {
 				//
 
 				// 제목 다운로드
-				log.println("=========="+pageNum+"==========");
+				log.println("==========" + pageNum + "==========");
 				log.print("[메타데이터] 페이지 찾는 중...");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
 					js_dellike.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 							driver.findElement(By.className("container_postbtn")));
 				} catch (Exception e) {
-					
-					
+
 					try {
 						blogView = driver.findElement(By.className("tit_error"));
-						if(blogView.getAttribute("innerHTML").equals("존재하지 않는 <span class=\"br_line\"><br></span>페이지 입니다.")) {
+						if (blogView.getAttribute("innerHTML").equals("존재하지 않는 <span class=\"br_line\"><br></span>페이지 입니다.")) {
 							// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
 							log.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
 
-							log.print(""+(delay+1000)+"ms 대기중...");
+							log.print("" + (delay + 1000) + "ms 대기중...");
 							try {
-								Thread.sleep(delay+1000);
+								Thread.sleep(delay + 1000);
 							} catch (InterruptedException ee) {// 다운로드
 							}
-							
+
 							if (emptyPageCount == emptyPageCheckLimit) {
 								log.println("\n\n백업이 모두 완료되었습니다.");
 								return; // 종료.
 							}
-							} else {
+						} else {
 
-								//TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
-								log.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
-								System.in.read();
-							}
-							continue;
-						
-						
-						
+							// TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
+							log.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							System.in.read();
+						}
+						continue;
+
 					} catch (Exception e2) {
 						// TODO: 자세한확인조건 추가필요 -> 완료((비밀번호 게시글)표시)
-						//비밀번호 게시글일때
+						// 비밀번호 게시글일때
 						WebElement passwordInput;
 						try {
-							passwordInput= driver.findElement(By.id("password"));
+							passwordInput = driver.findElement(By.id("password"));
 							passwordInput.sendKeys(password);
 							passwordInput.sendKeys(Keys.ENTER);
 							log.print("(비밀번호 게시글) ");
-							
+
 							// 비밀번호가 맞는지 확인하는 로직이 필요하다.
-							//아래는 테스트 안됨 - 비번 체크 로직
+							// 아래는 테스트 안됨 - 비번 체크 로직
 							try {
-							blogView = driver.findElement(By.className("blogview_content")); // 아무거나 하나 열어서 열리나 보기
-							} catch (Exception e_pwerror)
-							{
+								blogView = driver.findElement(By.className("blogview_content")); // 아무거나 하나 열어서 열리나 보기
+							} catch (Exception e_pwerror) {
 								log.println("[메타데이터] 암호가 맞지 않습니다. #error");
-								//log.println(e_pwerror);
+								// log.println(e_pwerror);
 								continue;
 							}
-							
-							//위는 테스트 안됨 - 비번 체크 로직
-							
+
+							// 위는 테스트 안됨 - 비번 체크 로직
+
 						} catch (Exception e3) {
 							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							System.in.read();
 						}
 
 					}
-					
-					
-					
+
 				}
 				log.println("완료");
 				emptyPageCount = 0;
@@ -236,21 +228,21 @@ public class Backup {
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
-					byte[] by = (titleElement.getText()+"\n\n---\n\n"+metaData).getBytes();
+					byte[] by = (titleElement.getText() + "\n\n---\n\n" + metaData).getBytes();
 					title.write(by);
 					title.close();
 				} catch (Exception e) {
 					log.println("[제목] 예상했던 곳에 제목이 적혀있지 않습니다.\n 티스토리가 변경되었거나 이 프로그램에 문제가 있습니다.");
-					//TODO: 파일 건너뛰었다는 로그 찍기
+					// TODO: 파일 건너뛰었다는 로그 찍기
 					e.printStackTrace();
-					log.print(""+(delay+1000)+"ms 대기중...");
+					log.print("" + (delay + 1000) + "ms 대기중...");
 					try {
-						Thread.sleep(delay+1000);
+						Thread.sleep(delay + 1000);
 					} catch (InterruptedException ee) {// 다운로드
 					}
 					continue; // 다음으로 건너뛰기
 				}
-				log.print("[제목] "+delay+"ms 대기중...");
+				log.print("[제목] " + delay + "ms 대기중...");
 				try {
 					Thread.sleep(delay);
 				} catch (InterruptedException ee) {// 과도트래픽 방지
@@ -262,14 +254,14 @@ public class Backup {
 				//
 				//
 				//
-				//log.println(saveDir(pageNum));
-				//log.print("[메타데이터] HTML 다운로드...");
+				// log.println(saveDir(pageNum));
+				// log.print("[메타데이터] HTML 다운로드...");
 				// File scrFile = ((TakesScreenshot) driver).getScreenshotAs(OutputType.FILE);
 				// File dest_scrFile = new File(save.saveDir(pageNum) + "/preview.jpg");
 				// copyFileUsingStream(scrFile, dest_scrFile);
 				// // container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
-				//log.println("완료");
-				
+				// log.println("완료");
+
 				log.print("[메타데이터] 섬네일 생성...");
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
@@ -282,41 +274,32 @@ public class Backup {
 				opt.delClass("kakao_head");
 				opt.delClass("blogview_head");
 
-						/*잡다구리 삭제*/
-						opt.delClass("section_differ");
-						
-					opt.delClass("viewpaging_wrap");
-					opt.delClass("section_relation");
+				/* 잡다구리 삭제 */
+				opt.delClass("section_differ");
 
-					opt.delClass("cmt_write"); //댓글작성칸 삭제
-											// 	opt.delId("comment"))); // 댓글삭제
-						/*잡다구리 삭제 끝*/
+				opt.delClass("viewpaging_wrap");
+				opt.delClass("section_relation");
 
+				opt.delClass("cmt_write"); // 댓글작성칸 삭제
+				// opt.delId("comment"))); // 댓글삭제
+				/* 잡다구리 삭제 끝 */
 
-
-
-				Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting
-				(10)).takeScreenshot(driver);
-
+				Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
 
 				final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
 				// specifies where the jpg image has to be written
-				imgwriter.setOutput(new FileImageOutputStream(
-						new File(save.saveDir(pageNum)+"/"+"Thumbnail.jpg")));
-				
+				imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
 
-						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); //섬네일 미리보기 화질 결정. 0.1f -> 10%  //  1f ->100%
+				JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+				jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+				jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 
-				// writes the file with given compression level 
+				// writes the file with given compression level
 				// from your JPEGImageWriteParam instance
 				imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams);
-				
 
-
-
-				//원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new File(".\\fullimage.webp"));
+				// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
+				// File(".\\fullimage.webp"));
 				//
 				//
 				//
@@ -341,8 +324,7 @@ public class Backup {
 
 						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
 							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-							log.println("[사진] 이미지 중복 발견 : img" + i + " 파일은 img" + j + " 파일과 같기 때문에 img" + j
-									+ " 파일로 통합하고 링크를 연결합니다.");
+							log.println("[사진] 이미지 중복 발견 : img" + i + " 파일은 img" + j + " 파일과 같기 때문에 img" + j + " 파일로 통합하고 링크를 연결합니다.");
 							break;
 						}
 					}
@@ -361,7 +343,7 @@ public class Backup {
 							log.println("[사진] 유형: Tistory 구서버 원본");
 						} else
 							log.println("[사진] 유형: 화면에 보이는 이미지");
-							//TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
+						// TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
 
 						dl.fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
 
@@ -380,18 +362,20 @@ public class Backup {
 					innerHTML = innerHTML.replaceAll("srcset=", "alt="); // 크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
 					// for (int ii = 0; ii < 1000; ii++)
 					try {
-						//innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" + imgNum + ".jpg");
-						
-						innerHTML = innerHTML.replace("src=\"//","src=\"https://"); //myskrpatch를 보니까 주소가 <img src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
-						innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], imageRealname[imgNum]);
-						log.println("교체대상 : "+imgURL[imgNum]);
-						log.println("교체전주소 : "+"img" + imgNum + ".jpg");
-						log.println("교체후주소 : "+imageRealname[imgNum]); //TODO: 이미지이름 한글일때 제대로 안나온다 시놀 도커 마크서버 참고
-						
-						//imageRealname
-						//log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
+						// innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" +
+						// imgNum + ".jpg");
+
+						innerHTML = innerHTML.replace("src=\"//", "src=\"https://"); // myskrpatch를 보니까 주소가 <img
+																																																																			// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
+						innerHTML = innerHTML.replace("&amp;", "&").replace(imgURL[imgNum], imageRealname[imgNum]);
+						log.println("교체대상 : " + imgURL[imgNum]);
+						log.println("교체전주소 : " + "img" + imgNum + ".jpg");
+						log.println("교체후주소 : " + imageRealname[imgNum]); // TODO: 이미지이름 한글일때 제대로 안나온다 시놀 도커 마크서버 참고
+
+						// imageRealname
+						// log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
 					} catch (Exception e) {
-						log.println("[사진] 이미지 주소를 교체할 수 없음: "+imgNum);
+						log.println("[사진] 이미지 주소를 교체할 수 없음: " + imgNum);
 					}
 
 					log.print("[메타데이터] HTML 다운로드...");
@@ -399,98 +383,83 @@ public class Backup {
 					writer.write(innerHTML);
 					writer.close();
 					log.println("완료");
-					
+
 				} // for (int i = 0; i < 1000; i++) } 이미지검색기 종료
 
-
-
-
-
-
-					///////////// 첨부파일 다운로드 영역 시작
-				for (int i = 0; i < 1000; i++) { ///이미지 다운로드가 아니라 첨부파일 다운로더
+				///////////// 첨부파일 다운로드 영역 시작
+				for (int i = 0; i < 1000; i++) { /// 이미지 다운로드가 아니라 첨부파일 다운로더
 					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
 
 					try {
 						log.print("[첨부파일] 블록 찾는 중...");
-						
+
 						try {// 신파일 구파일 체크 | 신버전 티스토리에서 첨부한 첨부파일은 HTML 양식이 다르다.
-							attachment = driver.findElement(By.className("imageblock")); //구파일
-							targetBlock = "imageblock"; //구파일이면 타겟을 구파일로 설정
+							attachment = driver.findElement(By.className("imageblock")); // 구파일
+							targetBlock = "imageblock"; // 구파일이면 타겟을 구파일로 설정
 							log.println("완료 (Tistory Old)");
 						} catch (Exception e) {
 							try {
-								attachment = driver.findElement(By.className("fileblock")); //신파일
-								targetBlock = "fileblock"; //신파일이면 타겟을 신파일로 설정
+								attachment = driver.findElement(By.className("fileblock")); // 신파일
+								targetBlock = "fileblock"; // 신파일이면 타겟을 신파일로 설정
 								log.println("완료 (Tistory New)");
 							} catch (Exception e2) {
-								attachment = driver.findElement(By.tagName("figure123123123123123123")); //구글드라이브
-								targetBlock = "googledrive"; //주의! : 클래스가 아님
+								attachment = driver.findElement(By.tagName("figure123123123123123123")); // 구글드라이브
+								targetBlock = "googledrive"; // 주의! : 클래스가 아님
 								log.println("완료 (Drive)");
 							}
 
 						}
-						
+
 					} catch (Exception e) {
 						log.println("블록 없음");
 						log.println("[첨부파일] 다운로드 완료 : " + i-- + "개");
 						break;
 					}
 
-					
 					try {
-					log.print("[첨부파일] 하이퍼링크 찾는 중...");
-					attachment = attachment.findElement(By.tagName("a"));
-					log.println("완료");
-					log.println("[첨부파일] URL: "+attachment.getAttribute("href"));
-					log.println("[첨부파일] 파일명: "+attachment.getText());
-					driver.navigate().to(attachment.getAttribute("href")); //파일 새 탭으로 열기
-					log.print("[첨부파일] "+delayFileDL+"ms 대기중...");
-					try {
-						Thread.sleep(delayFileDL); //다운완료까지 대기
-					} catch (InterruptedException ee) {// 다운로드
-					}
-					
+						log.print("[첨부파일] 하이퍼링크 찾는 중...");
+						attachment = attachment.findElement(By.tagName("a"));
+						log.println("완료");
+						log.println("[첨부파일] URL: " + attachment.getAttribute("href"));
+						log.println("[첨부파일] 파일명: " + attachment.getText());
+						driver.navigate().to(attachment.getAttribute("href")); // 파일 새 탭으로 열기
+						log.print("[첨부파일] " + delayFileDL + "ms 대기중...");
+						try {
+							Thread.sleep(delayFileDL); // 다운완료까지 대기
+						} catch (InterruptedException ee) {// 다운로드
+						}
 
+						log.println("완료");
+						// 폴더 참조
 
-					log.println("완료");
-					//폴더 참조
-					
-					
-					
-					 //파일 이동
-					log.println("[첨부파일] 파일 이동 시작");
-			        File tempDir = new File((myDir+"DownloadTemp").replace("/","\\"));
-			        File permanentDir = new File((save.saveDir(pageNum)).replace("/","\\"));
-					save.moveFile(tempDir, permanentDir);
-					log.println("[첨부파일] 파일 이동 완료");
-					
-					
-					
-					
-					js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-							driver.findElement(By.className(targetBlock)));
-					log.println("[첨부파일] 저장한 링크 삭제 완료");
-					} catch(Exception e) {  //imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
-					log.println("없음");
-					//e.printStackTrace();
-					try {
-						//log.println("href 없당"+e);
+						// 파일 이동
+						log.println("[첨부파일] 파일 이동 시작");
+						File tempDir = new File((myDir + "DownloadTemp").replace("/", "\\"));
+						File permanentDir = new File((save.saveDir(pageNum)).replace("/", "\\"));
+						save.moveFile(tempDir, permanentDir);
+						log.println("[첨부파일] 파일 이동 완료");
+
 						js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
 								driver.findElement(By.className(targetBlock)));
-						log.println("[첨부파일] 쓸모없는 블록 삭제완료");
-					} catch (Exception e2) {
-						log.println("[첨부파일] 쓸모없는 블록 삭제실패: ");
-						e2.printStackTrace();
-					}
-					}	//imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기 end				
-					
-					
-				}// for (int i = 0; i < 1000; i++) /첨부파일 다운로드 닫기
+						log.println("[첨부파일] 저장한 링크 삭제 완료");
+					} catch (Exception e) { // imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기
+						log.println("없음");
+						// e.printStackTrace();
+						try {
+							// log.println("href 없당"+e);
+							js_del_nonfile.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+									driver.findElement(By.className(targetBlock)));
+							log.println("[첨부파일] 쓸모없는 블록 삭제완료");
+						} catch (Exception e2) {
+							log.println("[첨부파일] 쓸모없는 블록 삭제실패: ");
+							e2.printStackTrace();
+						}
+					} // imageblock은 있는데 그 안에 a href가 없을 경우 쓸모없는 블록이므로 날려버리기 end
+
+				} // for (int i = 0; i < 1000; i++) /첨부파일 다운로드 닫기
 
 				///////////// 첨부파일 다운로드 영역 종료
-				
-				
+
 			} // 블로그 게시글 하나를 색인하는 for문 닫기
 
 		} catch (Exception e) {
