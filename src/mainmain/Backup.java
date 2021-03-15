@@ -92,11 +92,11 @@ public class Backup {
 	}
 
 	// WebDriver
-	private WebDriver driver;
+	public static WebDriver driver;
 
-	private WebElement imageClass;
-	private WebElement attachment; //첨부파일
-	private WebElement blogView;
+	public WebElement imageClass;
+	public WebElement attachment; //첨부파일
+	public WebElement blogView;
 
 	// Properties
 	
@@ -278,14 +278,19 @@ public class Backup {
 				// isDisplayed();
 				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
 				// 모바일상단바.isDisplayed();
+				Optimize opt = new Optimize();
+				opt.delClass("kakao_head");
+				opt.delClass("blogview_head");
 
-				JavascriptExecutor js_모바일상단바삭제 = (JavascriptExecutor) driver;
-				js_모바일상단바삭제.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-						driver.findElement(By.className("kakao_head")));
-				js_모바일상단바삭제.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-						driver.findElement(By.className("blogview_head")));
+						/*잡다구리 삭제*/
+						opt.delClass("section_differ");
+						
+					opt.delClass("viewpaging_wrap");
+					opt.delClass("section_relation");
 
-
+					opt.delClass("cmt_write"); //댓글작성칸 삭제
+											// 	opt.delId("comment"))); // 댓글삭제
+						/*잡다구리 삭제 끝*/
 
 
 
