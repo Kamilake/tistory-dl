@@ -348,7 +348,7 @@ public class Backup {
 
 						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
 							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-							log.println("[사진] 이미지 중복 발견 : img" + i + " 파일은 img" + j + " 파일과 같기 때문에 img" + j + " 파일로 통합하고 링크를 연결합니다.");
+							log.println("[사진] img" + i + " == img" + j + ". img" + j + "파일에 병합");
 							break;
 						}
 					}
