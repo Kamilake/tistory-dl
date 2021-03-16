@@ -111,7 +111,7 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--window-size=1200,3000");
+		options.addArguments("--window-size=800,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) {
@@ -142,7 +142,9 @@ public class Backup {
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
-			// System.in.read();
+			log.println("Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해야 합니다.");
+			log.println("그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
+			 System.in.read();
 
 			/**
 			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
