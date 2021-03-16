@@ -78,6 +78,7 @@ public class Download {
 			if(extension_raw != null && extension_raw.indexOf("filename=\"") != -1) {
 			    String netFileName = extension_raw.split("filename=\"")[1]; //getting value after '='
 			    netFileName = netFileName.split("\"")[0];
+							netFileName = netFileName.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂").replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞");
 			    log.println("[파일] 원본 파일 이름 : " + netFileName);
 //			    netFileName = netFileName.split("\\.")[1]; //getting value after '.'
 //			    log.println("[파일] 원본 파일 확장자 : " + netFileName);
