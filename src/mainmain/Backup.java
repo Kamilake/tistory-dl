@@ -47,7 +47,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FidoublerianrstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 293;
+	static int pageNum = 456;
 
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
@@ -141,9 +141,9 @@ public class Backup {
 		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
+			log.println("* Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해주세요.");
+			log.println("* 그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
-			log.println("Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해야 합니다.");
-			log.println("그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
 			 System.in.read();
 
 			/**
@@ -404,15 +404,12 @@ public class Backup {
 					} catch (Exception e) {
 						log.println("[사진] 이미지 주소를 교체할 수 없음: " + imgNum);
 					}
-
-					log.print("[메타데이터] HTML 다운로드...");
-					BufferedWriter writer = new BufferedWriter(new FileWriter(save.saveDir(pageNum) + "/index.html"));
-					writer.write(innerHTML);
-					writer.close();
-					log.println("완료");
-
 				} // for (int i = 0; i < 1000; i++) } 이미지검색기 종료
-
+				log.print("[메타데이터] HTML 다운로드...");
+				BufferedWriter writer = new BufferedWriter(new FileWriter(save.saveDir(pageNum) + "/index.html"));
+				writer.write(innerHTML);
+				writer.close();
+				log.println("완료");
 				///////////// 첨부파일 다운로드 영역 시작
 				for (int i = 0; i < 1000; i++) { /// 이미지 다운로드가 아니라 첨부파일 다운로더
 					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
