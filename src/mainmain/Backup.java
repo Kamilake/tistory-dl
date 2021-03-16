@@ -36,7 +36,7 @@ public class Backup {
 	Log log = new Log();
 
 	static String Version = "2021.03.16"; // 버전
-	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
+	static int delayFileDL = 7000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
@@ -360,7 +360,7 @@ public class Backup {
 							HiResURL = HiResURL + "?original";
 							log.println("[사진] 유형: DAUMCDN 원본");
 						} else if (imgURL[i].contains("daumcdn.net/thumb")) {
-							log.println("----------구서버 ->" + imgURL[i] + " contains? -->" + imgURL[i].contains("daumcdn.net/thumb"));
+							//log.println("----------구서버 ->" + imgURL[i] + " contains? -->" + imgURL[i].contains("daumcdn.net/thumb"));
 							HiResURL = HiResURL.split("%3A%2F%2F")[1];
 							HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
 							HiResURL = HiResURL.replace("cfile", "http://cfile");
