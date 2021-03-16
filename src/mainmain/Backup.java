@@ -5,6 +5,9 @@ import java.io.File;
 import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStream;
+import java.net.URLDecoder;
+import java.text.SimpleDateFormat;
+import java.util.Calendar;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -32,21 +35,21 @@ import ru.yandex.qatools.ashot.Screenshot;
 public class Backup {
 	Log log = new Log();
 
-	static String Version = "2021.03.14"; // 버전
+	static String Version = "2021.03.16"; // 버전
 	static int delayFileDL = 10000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
+	static boolean isHiDpi125 = true;
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	///////////////////////////////////////////////////////////////////////////////////////////////
+	/** 시작페이지 startPage FidoublerianrstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
+	static int pageNum = 293;
 
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 0;
-
-	/** 시값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
+	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
 
 	/** 암호걸린 게시글의 암호 해독 */
@@ -108,10 +111,15 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--window-size=1000,4000");
+		options.addArguments("--window-size=1200,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
+		String downloadFilepath = "";
+		if (myDir.equals("")) {
+			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp").replace("/", "\\");
+		} else {
+			downloadFilepath = (myDir + "DownloadTemp").replace("/", "\\");
+		}
 
-		String downloadFilepath = (myDir + "DownloadTemp").replace("/", "\\");
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		chromePrefs.put("download.default_directory", downloadFilepath);
@@ -126,21 +134,30 @@ public class Backup {
 	}
 
 	public void crawl() {
-
 		Save save = new Save();
 		Download dl = new Download();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문
-
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
-			System.in.read();
+			// System.in.read();
+
 			/**
 			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
 			 */
 			int emptyPageCount = 0;
+
+			if (isHiDpi125) {
+				// WebElement html = driver.findElement(By.tagName("html"));
+				// html.sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
+				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
+				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
+				// JavascriptExecutor executor = (JavascriptExecutor)driver;
+				// executor.executeScript("document.body.style.zoom = '80%'");
+			}
+		
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
 				log.println("검색중인 페이지 : " + pageNum);
@@ -224,7 +241,9 @@ public class Backup {
 				try {
 					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Metadata.txt");
 					WebElement titleElement;
-					String metaData = "HTB " + Version;
+					SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
+					String metaData = "Timestamp: [" + timestamp.format(Calendar.getInstance().getTime()) + "]\n" + "https://"
+							+ blogName + ".tistory.com/m/" + pageNum + "\n" + "HTB " + Version + "\n" + "blog.Kamilake.com";
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
@@ -270,19 +289,22 @@ public class Backup {
 				// isDisplayed();
 				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
 				// 모바일상단바.isDisplayed();
-				Optimize opt = new Optimize();
-				opt.delClass("kakao_head");
-				opt.delClass("blogview_head");
 
-				/* 잡다구리 삭제 */
-				opt.delClass("section_differ");
-
-				opt.delClass("viewpaging_wrap");
-				opt.delClass("section_relation");
-
-				opt.delClass("cmt_write"); // 댓글작성칸 삭제
-				// opt.delId("comment"))); // 댓글삭제
-				/* 잡다구리 삭제 끝 */
+				try {
+					Optimize opt = new Optimize();
+					opt.delClass("kakao_head");
+					opt.delClass("blogview_head");
+					/* 잡다구리 삭제 */
+					opt.delClass("section_differ");
+					opt.delClass("viewpaging_wrap");
+					opt.delClass("section_relation");
+					opt.delClass("cmt_write"); // 댓글작성칸 삭제
+					// opt.delId("comment"))); // 댓글삭제
+					/* 잡다구리 삭제 끝 */
+				} catch (Exception e) {
+					// TODO: handle exception
+					// 잡다한 서식 삭제 중 문제 생기면 오는 곳.
+				}
 
 				Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
 
@@ -336,10 +358,13 @@ public class Backup {
 							HiResURL = HiResURL + "?original";
 							log.println("[사진] 유형: DAUMCDN 원본");
 						} else if (imgURL[i].contains("daumcdn.net/thumb")) {
-
+							log.println("----------구서버 ->" + imgURL[i] + " contains? -->" + imgURL[i].contains("daumcdn.net/thumb"));
 							HiResURL = HiResURL.split("%3A%2F%2F")[1];
 							HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
 							HiResURL = HiResURL.replace("cfile", "http://cfile");
+							HiResURL = HiResURL.replace("t1.daumcdn", "http://t1.daumcdn");
+							HiResURL = URLDecoder.decode(HiResURL, "UTF-8");
+
 							log.println("[사진] 유형: Tistory 구서버 원본");
 						} else
 							log.println("[사진] 유형: 화면에 보이는 이미지");

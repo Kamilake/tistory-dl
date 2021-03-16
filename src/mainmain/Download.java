@@ -71,7 +71,7 @@ public class Download {
 			uCon = Url.openConnection();
 			//파일이름찾는 부분 시작 @@@@신버전 티스토리에선 헤더에 파일 이름을 넣지 않는다. 즉 실패. 하지만 첨부파일 다운로드에선 빛을 보일 수 있을지도? 아직 테스트해보지 않았다.@@@@
 			uCon.connect();
-			String extension_raw = uCon.getHeaderField("Content-Disposition");
+			String extension_raw = uCon.getHeaderField("Content-Disposition"); //TODO: 한글 받아오면 깨진다.
 			
 			//헤더예시 --> Content-Disposition: inline; filename="008.png"; filename*=UTF-8''008.png
 			// raw = "attachment; filename=abc.jpg"
