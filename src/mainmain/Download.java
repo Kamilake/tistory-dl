@@ -54,10 +54,10 @@ public class Download {
 										continue;
 						}
 						
-										System.out.println("sdfsfasafd");
+										//System.out.println("sdfsfasafd");
 										// watchKey_take = fileWatchService.take();
 										for (WatchEvent<?> event : watchKey.pollEvents()) {
-														System.out.println("aa :" + event.context().toString() + " , time : " + LocalDateTime.now());
+														//System.out.println("aa :" + event.context().toString() + " , time : " + LocalDateTime.now());
 														if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
 																		String fileName = event.context().toString();
 																		if (FilenameUtils.getExtension(fileName).equals("crdownload")){//아직 다운중

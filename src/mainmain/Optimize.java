@@ -26,6 +26,7 @@ public class Optimize {
   try {
     Thread.sleep(millis);
   } catch (Exception e) {
+    System.out.println("아니 여기서 왜 에러가 나지");
   }
  }
 }
