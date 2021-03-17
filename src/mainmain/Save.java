@@ -9,7 +9,7 @@ public class Save {
 
 	/** 페이지 번호를 주면 전체 절대경로를 반환합니다. @param 페이지번호 */
 	public String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
-		Log log = new Log();
+		//Log log = new Log();
 		// String blogName = "testblog2";
 		// String myDir = "";
 
