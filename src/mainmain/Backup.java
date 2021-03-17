@@ -9,6 +9,7 @@ import java.net.URLDecoder;
 import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import javax.imageio.ImageIO;
 import javax.imageio.ImageWriteParam;
@@ -46,8 +47,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
-	static int pageNum = 0;
-
+	static int pageNum = 26;
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
 
@@ -103,7 +103,7 @@ public class Backup {
 	// Properties
 
 	// private String base_url = "https://papago.naver.com/?sk=ja";
-
+	String downloadFilepath = "";
 	@SuppressWarnings("deprecation")
 	public Backup() {
 		super();
@@ -114,9 +114,9 @@ public class Backup {
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) {
-			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp").replace("/", "\\");
+			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
 		} else {
-			downloadFilepath = (myDir + "DownloadTemp").replace("/", "\\");
+			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
 		}
 
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
@@ -135,6 +135,7 @@ public class Backup {
 	public void crawl() {
 		Save save = new Save();
 		Download dl = new Download();
+		Optimize opt = new Optimize();
 		int imgNum = 0; // 다운로드할 이미지 번호를 지정(임시로만 사용) 중복이미지 필터링에 사용된다.
 		String HiResURL = ""; // 원본이미지 주소를 저장하게 될 공간
 		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문
@@ -293,7 +294,6 @@ public class Backup {
 				// 모바일상단바.isDisplayed();
 
 				try {
-					Optimize opt = new Optimize();
 					opt.delClass("kakao_head");
 					opt.delClass("blogview_head");
 					/* 잡다구리 삭제 */
@@ -307,8 +307,21 @@ public class Backup {
 					// TODO: handle exception
 					// 잡다한 서식 삭제 중 문제 생기면 오는 곳.
 				}
-				try {
+try { //댓글펼치기 누르기
+	while(true){
+	log.print("[댓글] 댓글 펼치는 중...");
+	//driver.findElement(By.className("link_cmtmore")).click();
+	((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
+	opt.delay(500);
+	log.println("");
+	}
+} catch (Exception e) {
+	log.println("완료");
+}
+				
 
+
+				try {
 					Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
 					final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
 					// specifies where the jpg image has to be written
@@ -455,15 +468,16 @@ public class Backup {
 						log.println("[첨부파일] URL: " + attachment.getAttribute("href"));
 						log.println("[첨부파일] 파일명: " + attachment.getText());
 						driver.navigate().to(attachment.getAttribute("href")); // 파일 새 탭으로 열기
-						log.print("[첨부파일] " + delayFileDL + "ms 대기중...");
-						try {
-							Thread.sleep(delayFileDL); // 다운완료까지 대기
-						} catch (InterruptedException ee) {// 다운로드
-						}
-
+						// log.print("[첨부파일] " + delayFileDL + "ms 대기중...");
+						// try {
+						// 	Thread.sleep(delayFileDL); // 다운완료까지 대기
+						// } catch (InterruptedException ee) {// 다운로드
+						// }
+						log.println(downloadFilepath);
+						Download.observeCompleteDL(downloadFilepath, 10, TimeUnit.SECONDS);
 						log.println("완료");
+						opt.delay(500); //크롬이 다운로드 실패 찍지 않게. 없어도 별문제는 안생긴다.
 						// 폴더 참조
-
 						// 파일 이동
 						log.println("[첨부파일] 파일 이동 시작");
 						File tempDir = new File((myDir + "DownloadTemp").replace("/", "\\"));
