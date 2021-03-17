@@ -20,4 +20,12 @@ public class Optimize {
     driver.findElement(By.id(idName01)));
   return 0;
  }
+
+ public void delay(int millis) {
+
+  try {
+    Thread.sleep(millis);
+  } catch (Exception e) {
+  }
+ }
 }
