@@ -6,8 +6,7 @@ import java.io.FileOutputStream;
 import java.io.FileWriter;
 import java.io.OutputStream;
 import java.net.URLDecoder;
-import java.text.SimpleDateFormat;
-import java.util.Calendar;
+import java.time.LocalDateTime;
 import java.util.HashMap;
 import java.util.Scanner;
 
@@ -38,7 +37,7 @@ public class Backup {
 	static String Version = "2021.03.16"; // 버전
 	static int delayFileDL = 7000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
 	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
-	static int emptyPageCheckLimit = 30; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
+	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
@@ -144,7 +143,7 @@ public class Backup {
 			log.println("* Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해주세요.");
 			log.println("* 그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
 			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
-			 System.in.read();
+			System.in.read();
 
 			/**
 			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
@@ -154,12 +153,14 @@ public class Backup {
 			if (isHiDpi125) {
 				// WebElement html = driver.findElement(By.tagName("html"));
 				// html.sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
-				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
-				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
+				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL,
+				// Keys.SUBTRACT ));
+				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL,
+				// Keys.SUBTRACT ));
 				// JavascriptExecutor executor = (JavascriptExecutor)driver;
 				// executor.executeScript("document.body.style.zoom = '80%'");
 			}
-		
+
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
 				log.println("검색중인 페이지 : " + pageNum);
@@ -243,9 +244,8 @@ public class Backup {
 				try {
 					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Metadata.txt");
 					WebElement titleElement;
-					SimpleDateFormat timestamp = new SimpleDateFormat("yyyy-MM-dd HH:mm:ss");
-					String metaData = "Timestamp: [" + timestamp.format(Calendar.getInstance().getTime()) + "]\n" + "https://"
-							+ blogName + ".tistory.com/m/" + pageNum + "\n" + "HTB " + Version + "\n" + "blog.Kamilake.com";
+					String metaData = "Timestamp: [" + LocalDateTime.now() + "]\n" + "https://" + blogName + ".tistory.com/m/"
+							+ pageNum + "\n" + "HTB " + Version + "\n" + "blog.Kamilake.com";
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
@@ -307,30 +307,37 @@ public class Backup {
 					// TODO: handle exception
 					// 잡다한 서식 삭제 중 문제 생기면 오는 곳.
 				}
+				try {
 
-				Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
+					Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
+					final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
+					// specifies where the jpg image has to be written
+					imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
 
-				final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
-				// specifies where the jpg image has to be written
-				imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
+					JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+					jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+					jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 
-				JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-				jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-				jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
+					// writes the file with given compression level
+					// from your JPEGImageWriteParam instance
+					imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다. 예외 발생시
+																																																																																				// 직접 기록하는 코드 필요
 
-				// writes the file with given compression level
-				// from your JPEGImageWriteParam instance
-				imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams);
-
-				// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
-				// File(".\\fullimage.webp"));
+					// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
+					// File(".\\fullimage.webp"));
+					log.println("완료");
+				} catch (Exception e) {
+					// TODO: handle exception
+					log.println("실패 : ");
+					e.printStackTrace();
+				}
 				//
 				//
 				//
 				//
 				//
 				//
-				log.println("완료\n[사진] 사진 다운로드 시작");
+				log.println("[사진] 사진 다운로드 시작");
 				for (int i = 0; i < 1000; i++) {
 					imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
 					try {
@@ -360,7 +367,8 @@ public class Backup {
 							HiResURL = HiResURL + "?original";
 							log.println("[사진] 유형: DAUMCDN 원본");
 						} else if (imgURL[i].contains("daumcdn.net/thumb")) {
-							//log.println("----------구서버 ->" + imgURL[i] + " contains? -->" + imgURL[i].contains("daumcdn.net/thumb"));
+							// log.println("----------구서버 ->" + imgURL[i] + " contains? -->" +
+							// imgURL[i].contains("daumcdn.net/thumb"));
 							HiResURL = HiResURL.split("%3A%2F%2F")[1];
 							HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
 							HiResURL = HiResURL.replace("cfile", "http://cfile");
