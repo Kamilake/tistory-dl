@@ -34,12 +34,9 @@ import ru.yandex.qatools.ashot.Screenshot;
 
 public class Backup {
 
-
-
-
 	static String Version = "2021.03.16"; // 버전
 	static int delayFileDL = 7000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
-	static int delay = 2000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
+	static int delay = 2500; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
@@ -56,26 +53,7 @@ public class Backup {
 	static String password = "1111";
 	float jpegParams_setCompressionQuality = 0.3f; // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
-	
-	
-	
 
-
-
-
-
-
-
-	
-	
-	
-	
-	
-	
-	
-	
-	
-	
 	// TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
 	String[] imgURL = new String[1000];
 	/**
@@ -117,6 +95,7 @@ public class Backup {
 
 	// private String base_url = "https://papago.naver.com/?sk=ja";
 	String downloadFilepath = "";
+
 	@SuppressWarnings("deprecation")
 	public Backup() {
 		super();
@@ -297,15 +276,6 @@ public class Backup {
 				// // container_postbtn #post_button_group (좋아요 공감 버튼)삭제 - 추후 GUI화하면 옵션으로 제공
 				// log.println("완료");
 
-				log.print("[메타데이터] 섬네일 생성...");
-				// blogview_content (본문 블록)찾아서 복제
-				blogView = driver.findElement(By.className("blogview_content"));
-				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
-
-				// isDisplayed();
-				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
-				// 모바일상단바.isDisplayed();
-
 				try {
 					opt.delClass("kakao_head");
 					opt.delClass("blogview_head");
@@ -320,19 +290,25 @@ public class Backup {
 					// TODO: handle exception
 					// 잡다한 서식 삭제 중 문제 생기면 오는 곳.
 				}
-try { //댓글펼치기 누르기
-	while(true){
-	log.print("[댓글] 댓글 펼치는 중...");
-	//driver.findElement(By.className("link_cmtmore")).click();
-	((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
-	opt.delay(500);
-	log.println("");
-	}
-} catch (Exception e) {
-	log.println("완료");
-}
-				
+				try { // 댓글펼치기 누르기
+					for (int comment_i = 0; comment_i < 100; comment_i++) {
+						log.print("[댓글] 댓글 펼치는 중..." + comment_i);
+						// driver.findElement(By.className("link_cmtmore")).click();
+						((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
+						opt.delay(500);
+						log.println("");
+					}
+				} catch (Exception e) {
+					log.println("완료");
+				}
+				log.print("[메타데이터] 섬네일 생성...");
+				// blogview_content (본문 블록)찾아서 복제
+				blogView = driver.findElement(By.className("blogview_content"));
+				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
 
+				// isDisplayed();
+				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
+				// 모바일상단바.isDisplayed();
 
 				try {
 					Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
@@ -483,13 +459,13 @@ try { //댓글펼치기 누르기
 						driver.navigate().to(attachment.getAttribute("href")); // 파일 새 탭으로 열기
 						// log.print("[첨부파일] " + delayFileDL + "ms 대기중...");
 						// try {
-						// 	Thread.sleep(delayFileDL); // 다운완료까지 대기
+						// Thread.sleep(delayFileDL); // 다운완료까지 대기
 						// } catch (InterruptedException ee) {// 다운로드
 						// }
 						log.println(downloadFilepath);
 						Download.observeCompleteDL(downloadFilepath, 10, TimeUnit.SECONDS);
 						log.println("완료");
-						opt.delay(500); //크롬이 다운로드 실패 찍지 않게. 없어도 별문제는 안생긴다.
+						opt.delay(1000); // 크롬이 다운로드 실패 찍지 않게. 없어도 별문제는 안생긴다.
 						// 폴더 참조
 						// 파일 이동
 						log.println("[첨부파일] 파일 이동 시작");
