@@ -105,7 +105,7 @@ public class Backup {
 		options.addArguments("--window-size=800,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
-		if (myDir.equals("")) {
+		if (myDir.equals("")) { //크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
 			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
 		} else {
 			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
