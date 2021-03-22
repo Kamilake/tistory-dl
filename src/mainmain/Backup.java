@@ -35,8 +35,8 @@ import ru.yandex.qatools.ashot.Screenshot;
 public class Backup {
 
 	static String Version = "2021.03.16"; // 버전
-	static int delayFileDL = 7000; // 첨부파일을 다운로드하는 동안 기다리는 시간(다운로드 완료 시간 이상으로 설정하세요)(기본:4000)
-	static int delay = 2500; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
+	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
+	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
@@ -295,7 +295,7 @@ public class Backup {
 						log.print("[댓글] 댓글 펼치는 중..." + comment_i);
 						// driver.findElement(By.className("link_cmtmore")).click();
 						((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
-						opt.delay(500);
+						opt.delay(delayFileDL);
 						log.println("");
 					}
 				} catch (Exception e) {
