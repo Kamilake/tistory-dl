@@ -51,6 +51,12 @@ public class Backup {
 	static String blogName = "";
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
+
+	static boolean Enable_Image_download = false;
+	static boolean Enable_Thumbnail_Screenshot = false;
+	// static boolean Enable_Image_download = false;
+	// static boolean Enable_Image_download = false;
+
 	float jpegParams_setCompressionQuality = 0.3f; // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
 
@@ -237,8 +243,13 @@ public class Backup {
 				try {
 					OutputStream title = new FileOutputStream(save.saveDir(pageNum) + "/Metadata.txt");
 					WebElement titleElement;
-					String metaData = "Timestamp: [" + LocalDateTime.now() + "]\n" + "https://" + blogName + ".tistory.com/m/"
-							+ pageNum + "\n" + "HTB " + Version + "\n" + "blog.Kamilake.com";
+					String metaData = "";
+					metaData += "Timestamp: [" + LocalDateTime.now() + "]\n";
+					metaData += "https://" + blogName + ".tistory.com/m/" + pageNum + "\n";
+					metaData += "Enable_Image_download: " + (Enable_Image_download ? "Enabled" : "Disabled" + "\n");
+					metaData += "Enable_Thumbnail_Screenshot: " + (Enable_Thumbnail_Screenshot ? "Enabled" : "Disabled" + "\n");
+					metaData += "HTB " + Version + "\n" + "blog.Kamilake.com";
+
 					titleElement = driver.findElement(By.className("blogview_tit"));
 					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
@@ -301,37 +312,40 @@ public class Backup {
 				} catch (Exception e) {
 					log.println("완료");
 				}
-				log.print("[메타데이터] 섬네일 생성...");
+				log.print("[메타데이터] HTML 저장...");
 				// blogview_content (본문 블록)찾아서 복제
 				blogView = driver.findElement(By.className("blogview_content"));
 				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
+				log.println("완료");
+				if (Enable_Thumbnail_Screenshot) {
+					log.print("[메타데이터] 섬네일 생성...");
+					// isDisplayed();
+					// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
+					// 모바일상단바.isDisplayed();
 
-				// isDisplayed();
-				// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
-				// 모바일상단바.isDisplayed();
+					try {
+						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
+						final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
+						// specifies where the jpg image has to be written
+						imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
 
-				try {
-					Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
-					final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
-					// specifies where the jpg image has to be written
-					imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
+						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
+						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
+						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 
-					JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
-					jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-					jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
+						// writes the file with given compression level
+						// from your JPEGImageWriteParam instance
+						imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다. 예외 발생시
+																																																																																					// 직접 기록하는 코드 필요
 
-					// writes the file with given compression level
-					// from your JPEGImageWriteParam instance
-					imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다. 예외 발생시
-																																																																																				// 직접 기록하는 코드 필요
-
-					// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
-					// File(".\\fullimage.webp"));
-					log.println("완료");
-				} catch (Exception e) {
-					// TODO: handle exception
-					log.println("실패 : ");
-					e.printStackTrace();
+						// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
+						// File(".\\fullimage.webp"));
+						log.println("완료");
+					} catch (Exception e) {
+						// TODO: handle exception
+						log.println("실패 : ");
+						e.printStackTrace();
+					}
 				}
 				//
 				//
@@ -339,82 +353,84 @@ public class Backup {
 				//
 				//
 				//
-				log.println("[사진] 사진 다운로드 시작");
-				for (int i = 0; i < 1000; i++) {
-					imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
-					try {
-						// imageClass = driver.findElement(By.className("imageblock"));
-						imageClass = blogView.findElement(By.tagName("img"));
-					} catch (Exception e) {
-						log.println("[사진] 사진 다운로드 완료 : " + i-- + "개");
-						break;
-					}
-					// imageClass = imageClass.findElement(By.tagName("img"));
-					imgURL[i] = imageClass.getAttribute("src");// 사진 주소들 저장해두기
-					// log.println("사진 " + i + " 주소: " + imgURL[i]);
-					log.println("[사진] 이미지 번호: " + i);
-					for (int j = 0; j < i; j++) {// (제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
-
-						if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
-							imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
-							log.println("[사진] img" + i + " == img" + j + ". img" + j + "파일에 병합");
+				if (Enable_Image_download) {
+					log.println("[사진] 사진 다운로드 시작");
+					for (int i = 0; i < 1000; i++) {
+						imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
+						try {
+							// imageClass = driver.findElement(By.className("imageblock"));
+							imageClass = blogView.findElement(By.tagName("img"));
+						} catch (Exception e) {
+							log.println("[사진] 사진 다운로드 완료 : " + i-- + "개");
 							break;
 						}
-					}
+						// imageClass = imageClass.findElement(By.tagName("img"));
+						imgURL[i] = imageClass.getAttribute("src");// 사진 주소들 저장해두기
+						// log.println("사진 " + i + " 주소: " + imgURL[i]);
+						log.println("[사진] 이미지 번호: " + i);
+						for (int j = 0; j < i; j++) {// (제작예정)사진이 이전과 중복인 지 확인하기 - 모든 배열을 검사해 중복 사진일 경우 그 파일과 하나로 합친다.
 
-					try { // 링크 원본으로 치환 후 다운로드
-						HiResURL = imgURL[i];
+							if (imgURL[i].equals(imgURL[j])) {// if 지금 다운받으려고하는 이미지 == 원래이미지
+								imgNum = j; // then 이미지 번호를 j(이전 중복이미지)로 바꿔버린다.
+								log.println("[사진] img" + i + " == img" + j + ". img" + j + "파일에 병합");
+								break;
+							}
+						}
 
-						if (imgURL[i].contains("daumcdn.net/cfile/tistory")) {
-							HiResURL = HiResURL + "?original";
-							log.println("[사진] 유형: DAUMCDN 원본");
-						} else if (imgURL[i].contains("daumcdn.net/thumb")) {
-							// log.println("----------구서버 ->" + imgURL[i] + " contains? -->" +
-							// imgURL[i].contains("daumcdn.net/thumb"));
-							HiResURL = HiResURL.split("%3A%2F%2F")[1];
-							HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
-							HiResURL = HiResURL.replace("cfile", "http://cfile");
-							HiResURL = HiResURL.replace("t1.daumcdn", "http://t1.daumcdn");
-							HiResURL = URLDecoder.decode(HiResURL, "UTF-8");
+						try { // 링크 원본으로 치환 후 다운로드
+							HiResURL = imgURL[i];
 
-							log.println("[사진] 유형: Tistory 구서버 원본");
-						} else
-							log.println("[사진] 유형: 화면에 보이는 이미지");
-						// TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
+							if (imgURL[i].contains("daumcdn.net/cfile/tistory")) {
+								HiResURL = HiResURL + "?original";
+								log.println("[사진] 유형: DAUMCDN 원본");
+							} else if (imgURL[i].contains("daumcdn.net/thumb")) {
+								// log.println("----------구서버 ->" + imgURL[i] + " contains? -->" +
+								// imgURL[i].contains("daumcdn.net/thumb"));
+								HiResURL = HiResURL.split("%3A%2F%2F")[1];
+								HiResURL = HiResURL.replace("%2Fimage%2F", "/original/");
+								HiResURL = HiResURL.replace("cfile", "http://cfile");
+								HiResURL = HiResURL.replace("t1.daumcdn", "http://t1.daumcdn");
+								HiResURL = URLDecoder.decode(HiResURL, "UTF-8");
 
-						dl.fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
+								log.println("[사진] 유형: Tistory 구서버 원본");
+							} else
+								log.println("[사진] 유형: 화면에 보이는 이미지");
+							// TODO : 버그-> 외부링크 다운로드하면 가끔 x박스로 뜬다. url 리맵핑 개선 필요
 
-					} catch (Exception e) {
-						log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
-						imgNum = 999;
-					}
+							dl.fileUrlReadAndDownload(HiResURL, "img" + imgNum, save.saveDir(pageNum), imgNum);
 
-					JavascriptExecutor js_delimg = (JavascriptExecutor) driver;
-					js_delimg.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-							driver.findElement(By.tagName("img")));
+						} catch (Exception e) {
+							log.println("[사진] 이미지 다운로드 오류 : " + imgNum);
+							imgNum = 999;
+						}
 
-					// 이 시점에서 imgurl[imgnum] 속 링크는 "img" + imgNum + ".jpg" 와 같다.
+						JavascriptExecutor js_delimg = (JavascriptExecutor) driver;
+						js_delimg.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+								driver.findElement(By.tagName("img")));
 
-					///////////// html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
-					innerHTML = innerHTML.replaceAll("srcset=", "alt="); // 크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
-					// for (int ii = 0; ii < 1000; ii++)
-					try {
-						// innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" +
-						// imgNum + ".jpg");
+						// 이 시점에서 imgurl[imgnum] 속 링크는 "img" + imgNum + ".jpg" 와 같다.
 
-						innerHTML = innerHTML.replace("src=\"//", "src=\"https://"); // myskrpatch를 보니까 주소가 <img
-																																																																			// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
-						innerHTML = innerHTML.replace("&amp;", "&").replace(imgURL[imgNum], imageRealname[imgNum]);
-						log.println("교체대상 : " + imgURL[imgNum]);
-						log.println("교체전주소 : " + "img" + imgNum + ".jpg");
-						log.println("교체후주소 : " + imageRealname[imgNum]); // TODO: 이미지이름 한글일때 제대로 안나온다 시놀 도커 마크서버 참고
+						///////////// html파일 속 이미지 링크를 로컬 링크로 바꾸는 부분
+						innerHTML = innerHTML.replaceAll("srcset=", "alt="); // 크롬으로 열면 어째선지 sec보다 sreset 속 링크가 먼저 보여지는 듯..
+						// for (int ii = 0; ii < 1000; ii++)
+						try {
+							// innerHTML = innerHTML.replace("&amp;","&").replace(imgURL[imgNum], "img" +
+							// imgNum + ".jpg");
 
-						// imageRealname
-						// log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
-					} catch (Exception e) {
-						log.println("[사진] 이미지 주소를 교체할 수 없음: " + imgNum);
-					}
-				} // for (int i = 0; i < 1000; i++) } 이미지검색기 종료
+							innerHTML = innerHTML.replace("src=\"//", "src=\"https://"); // myskrpatch를 보니까 주소가 <img
+																																																																				// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
+							innerHTML = innerHTML.replace("&amp;", "&").replace(imgURL[imgNum], imageRealname[imgNum]);
+							log.println("교체대상 : " + imgURL[imgNum]);
+							log.println("교체전주소 : " + "img" + imgNum + ".jpg");
+							log.println("교체후주소 : " + imageRealname[imgNum]); // TODO: 이미지이름 한글일때 제대로 안나온다 시놀 도커 마크서버 참고
+
+							// imageRealname
+							// log.println("이미지 주소교체 완료 : "+imgNum+" / "+imgURL[imgNum]);
+						} catch (Exception e) {
+							log.println("[사진] 이미지 주소를 교체할 수 없음: " + imgNum);
+						}
+					} // for (int i = 0; i < 1000; i++) } 이미지검색기 종료
+				} // endif Enable_Image_download
 				log.print("[메타데이터] HTML 다운로드...");
 				BufferedWriter writer = new BufferedWriter(new FileWriter(save.saveDir(pageNum) + "/index.html"));
 				writer.write(innerHTML);
