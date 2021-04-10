@@ -76,7 +76,7 @@ public class Backup {
 		log.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
 		log.println("참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
-
+//크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다.
 		log.println("\nHyper Tistory Backupper " + Version + " - blog.Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
@@ -110,7 +110,7 @@ public class Backup {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--window-size=800,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
-		String downloadFilepath = "";
+		// String downloadFilepath = "";
 		if (myDir.equals("")) {
 			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
 		} else {
@@ -120,6 +120,7 @@ public class Backup {
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		chromePrefs.put("download.default_directory", downloadFilepath);
+		chromePrefs.put("download.prompt_for_download", "false");
 		options.setExperimentalOption("prefs", chromePrefs);
 		DesiredCapabilities cap = DesiredCapabilities.chrome();
 		cap.setCapability(CapabilityType.ACCEPT_SSL_CERTS, false);
