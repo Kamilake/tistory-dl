@@ -34,7 +34,7 @@ import ru.yandex.qatools.ashot.Screenshot;
 
 public class Backup {
 
-	static String Version = "2021.03.16"; // 버전
+	static String Version = "2021.03.16.a"; // 버전
 	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
 	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
