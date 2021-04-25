@@ -277,9 +277,11 @@ public class Backup {
 				// log.println("완료");
 
 				try {
-					opt.delClass("kakao_head");
-					opt.delClass("blogview_head");
+					opt.delClass("kakao_head"); // 스크롤캡쳐시 상단바가 보이기 때문
+					opt.delClass("blogview_head"); // 스크롤캡쳐시 상단바가 보이기 때문
 					/* 잡다구리 삭제 */
+					opt.delClass("adsenseMobileAd1"); //구글광고
+					opt.delId("bannerWrap"); //카카오광고
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
