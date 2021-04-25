@@ -26,71 +26,77 @@ import static mainmain.Backup.imageRealname;
 public class Download {
 
 	/**
-		*  다운로드 완료까지 대기. crdownload는 무시
-		* @param targetDirectory (크롬이 파일 저장하는 곳)
-		* @param polltimeout 10 (초)
-		* @param polltimeunit TimeUnit.SECONDS
-		* @throws InterruptedException
+	 * 다운로드 완료까지 대기. crdownload는 무시
+	 * 
+	 * @param targetDirectory (크롬이 파일 저장하는 곳)
+	 * @param polltimeout     10 (초)
+	 * @param polltimeunit    TimeUnit.SECONDS
+	 * @throws InterruptedException
 	 */
-	public static void observeCompleteDL(String targetDirectory, long polltimeout, TimeUnit polltimeunit) throws InterruptedException {
+	public static void observeCompleteDL(String targetDirectory, long polltimeout, TimeUnit polltimeunit)
+			throws InterruptedException {
 		Log log = new Log();
-		targetDirectory = "D:/Users/exjang/Documents/GitHub/Hyper_Tistory_Backupper/DownloadTemp/";
+		// targetDirectory = "D:/Users/exjang/Documents/GitHub/Hyper_Tistory_Backupper/DownloadTemp/";
 		try {
-			
-						WatchService fileWatchService = FileSystems.getDefault().newWatchService();
-						WatchKey watchKey_path = Paths.get(targetDirectory).register(fileWatchService, StandardWatchEventKinds.ENTRY_CREATE);
-						boolean valid = true;
-						int ttl=5;
 
-						while(valid && ttl!=0){
-						ttl = ttl - 1;
-						WatchKey watchKey = fileWatchService.poll(polltimeout, polltimeunit);
-						if(watchKey == null)
-						{
+			WatchService fileWatchService = FileSystems.getDefault().newWatchService();
+			WatchKey watchKey_path = Paths.get(targetDirectory).register(fileWatchService, StandardWatchEventKinds.ENTRY_CREATE);
+			boolean valid = true;
+			int ttl = 5;
 
-										System.out.println("[첨부파일] 실패 - 시간 초과 (남은 재시도 횟수 : "+ttl+")");
-										watchKey_path.cancel();
-										continue;
+			while (valid && ttl != 0) {
+				ttl = ttl - 1;
+				WatchKey watchKey = fileWatchService.poll(polltimeout, polltimeunit);
+				if (watchKey == null) {
+
+					System.out.println("[첨부파일] 실패 - 시간 초과 (남은 재시도 횟수 : " + ttl + ")");
+					watchKey_path.cancel();
+					continue;
+				}
+
+				// System.out.println("sdfsfasafd");
+				// watchKey_take = fileWatchService.take();
+				int ttl2 = 100;
+				for (WatchEvent<?> event : watchKey.pollEvents()) {
+					// System.out.println("aa :" + event.context().toString() + " , time : " +
+					// LocalDateTime.now());
+					try{
+					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+						String fileName = event.context().toString();
+						if (FilenameUtils.getExtension(fileName).equals("crdownload") || FilenameUtils.getExtension(fileName).equals("tmp")) {// 아직 다운중
+							log.println("[첨부파일] 다운로드 시작 :" + fileName);
+						} else {
+							log.println("[첨부파일] 다운로드 완료 :" + fileName);
+							watchKey.reset();
+							watchKey.cancel();
+							watchKey.reset();
+							watchKey.cancel();
+							return;
 						}
-						
-										//System.out.println("sdfsfasafd");
-										// watchKey_take = fileWatchService.take();
-										for (WatchEvent<?> event : watchKey.pollEvents()) {
-														//System.out.println("aa :" + event.context().toString() + " , time : " + LocalDateTime.now());
-														if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-																		String fileName = event.context().toString();
-																		if (FilenameUtils.getExtension(fileName).equals("crdownload")){//아직 다운중
-	log.println("[첨부파일] 다운로드 시작 :" + fileName);
-} else
-{
-	log.println("[첨부파일] 다운로드 완료 :" + fileName);
-	watchKey.reset();
-	watchKey.cancel();
-	watchKey.reset();
-	watchKey.cancel();
-	return;
-}
 
+						// if(FilenameUtils.getExtension(fileName));
 
-																		//if(FilenameUtils.getExtension(fileName));
+					} else {
+						log.println("UNKNOWN EVENT ......");
+					}
+				} catch (Exception e3){
+					System.out.println("[첨부파일] 실패 - 알 수 없음 (남은 재시도 횟수 : " + ttl2-- + ")");
+					if(ttl2 == 0) break;
+					continue;
+				}
+				}
+				valid = watchKey.reset();
 
-														}else{
-																		log.println("UNKNOWN EVENT ......");
-														}
-										}
-										valid = watchKey.reset();
-										
-						
-							}
-						// watchKey_path.reset();
-						// watchKey_path.cancel();
+			}
+			// watchKey_path.reset();
+			// watchKey_path.cancel();
 
-						log.println("[첨부파일] 다운로드 실패 - TTL 초과");
-		} catch (IOException  e) {
-						log.println("[첨부파일] 다운로드 실패 ->");
-						e.printStackTrace();
+			log.println("[첨부파일] 다운로드 실패 - TTL 초과");
+		} catch (IOException e) {
+			log.println("[첨부파일] 다운로드 실패 ->");
+			e.printStackTrace();
 		}
-}
+	}
 
 	String humanReadableByteCountSI(long bytes) {
 		if (-1000 < bytes && bytes < 1000) {
