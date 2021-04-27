@@ -38,7 +38,7 @@ public class Backup {
 	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
 	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
-	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
+	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
 	static boolean isHiDpi125 = true;
@@ -54,6 +54,7 @@ public class Backup {
 
 	static boolean Enable_Image_download = false;
 	static boolean Enable_Thumbnail_Screenshot = false;
+	static boolean Allow_Duplicate_Downloads = false;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
 
@@ -71,13 +72,13 @@ public class Backup {
 
 	public static void main(String[] args) {////////// MAIN
 		Log log = new Log();
-		log.println("참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
-		log.println("참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
-		log.println("참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
-		log.println("참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
-		log.println("참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
-//크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다.
-		log.println("\nHyper Tistory Backupper " + Version + " - blog.Kamilake.com\n");
+		log.println("[tistory-dl] 참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
+		log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
+		log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
+		log.println("[tistory-dl] 참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
+		log.println("[tistory-dl] 참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
+		// 크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다.
+		log.println("\n[tistory-dl] tistory-dl" + Version + " - blog.Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
@@ -163,7 +164,18 @@ public class Backup {
 
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
-				log.println("검색중인 페이지 : " + pageNum);
+				log.println("[tistory-dl]검색중인 페이지 : " + pageNum);
+
+				// 이미 다운로드한 페이지인지 확인하는 부분 시작
+				if (Allow_Duplicate_Downloads == false) {
+
+					if (save.isDirExists(pageNum)) {
+						log.println("[tistory-dl] 페이지 " + pageNum + " 건너뛰기.");
+						continue;
+					}
+				}
+				// 이미 다운로드한 페이지인지 확인하는 부분 끝.
+
 				driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum);
 				// liveBtn = driver.findElement(By.id("txtSource"));
 				// liveBtn.click();
@@ -177,7 +189,7 @@ public class Backup {
 				//
 
 				// 제목 다운로드
-				log.println("==========" + pageNum + "==========");
+				log.println("[tistory-dl] ==========" + pageNum + "==========");
 				log.print("[메타데이터] 페이지 찾는 중...");
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
@@ -198,13 +210,13 @@ public class Backup {
 							}
 
 							if (emptyPageCount == emptyPageCheckLimit) {
-								log.println("\n\n백업이 모두 완료되었습니다.");
+								log.println("\n\n\n[tistory-dl] 백업이 모두 완료되었습니다.");
 								return; // 종료.
 							}
 						} else {
 
 							// TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
-							log.println("빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println("[tistory-dl] 빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							System.in.read();
 						}
 						continue;
@@ -252,7 +264,8 @@ public class Backup {
 					metaData += "HTB " + Version + "\n" + "blog.Kamilake.com";
 
 					titleElement = driver.findElement(By.className("blogview_tit"));
-					titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를 찾으면 될 듯.
+					// titleElement.findElement(By.className("tit_blogview")); // 작동하지 않는다. h2 클래스를
+					// 찾으면 될 듯.
 					log.println("[제목] " + titleElement.getText().replace("\n", "\n[제목] "));
 					byte[] by = (titleElement.getText() + "\n\n---\n\n" + metaData).getBytes();
 					title.write(by);
