@@ -17,6 +17,8 @@ import javax.imageio.IIOImage;
 import javax.imageio.ImageWriter;
 import javax.imageio.plugins.jpeg.JPEGImageWriteParam;
 import javax.imageio.stream.FileImageOutputStream;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
@@ -27,6 +29,8 @@ import org.openqa.selenium.chrome.ChromeDriver;
 import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
+import org.w3c.dom.Document;
+import org.w3c.dom.NodeList;
 
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.AShot;
@@ -41,20 +45,23 @@ public class Backup {
 	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
-	static boolean isHiDpi125 = true;
+	static boolean isHiDpi125 = false;
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
 	static int pageNum = 0;
+	static int pageNum_total = 0; //전체 페이지 수
+	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "";
+	static String blogName = "bxmpe";
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
 	static boolean Enable_Image_download = false;
 	static boolean Enable_Thumbnail_Screenshot = false;
 	static boolean Allow_Duplicate_Downloads = false;
+	static boolean Use_Sitemap = true;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
 
@@ -112,7 +119,7 @@ public class Backup {
 		options.addArguments("--window-size=800,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
-		if (myDir.equals("")) { //크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
+		if (myDir.equals("")) { // 크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
 			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
 		} else {
 			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
@@ -141,10 +148,6 @@ public class Backup {
 		String targetBlock = "imageblock"; // imageblock or fileblock 첨부파일이 저장되어 있는 html 구문
 		try {
 			driver.get("https://" + blogName + ".tistory.com/m/");
-			log.println("* Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해주세요.");
-			log.println("* 그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
-			log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
-			System.in.read();
 
 			/**
 			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
@@ -152,6 +155,10 @@ public class Backup {
 			int emptyPageCount = 0;
 
 			if (isHiDpi125) {
+				log.println("* Hidpi 배율이 커스텀 125%인 사람은 지금 수동으로 브라우저의 배율을 80%로 설정해주세요.");
+				log.println("* 그렇지 않으면 AShot 전체 스크린샷에서 오른쪽과 아래가 잘려 나옵니다");
+				log.println("Tistory에 로그인하거나 Enter키를 눌러 넘어갑니다.");
+				System.in.read();
 				// WebElement html = driver.findElement(By.tagName("html"));
 				// html.sendKeys(Keys.chord(Keys.CONTROL, Keys.SUBTRACT ));
 				// driver.findElement(By.tagName("html")).sendKeys(Keys.chord(Keys.CONTROL,
@@ -162,9 +169,27 @@ public class Backup {
 				// executor.executeScript("document.body.style.zoom = '80%'");
 			}
 
+			DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
+			DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
+			Document sitemap = null;
+			if (Use_Sitemap) {
+				sitemap = dBuilder.parse("https://" + blogName + ".tistory.com/sitemap.xml");
+				sitemap.getDocumentElement().normalize();
+				System.out.println("Root element: " + sitemap.getDocumentElement().getNodeName());
+				NodeList nList = sitemap.getElementsByTagName("url");
+				pageNum_total = nList.getLength();
+				System.out.println("게시글 수 : " + pageNum_total);
+			} 
 			// Thread.sleep(5000);
-			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */; pageNum++) { // 블로그 게시글 하나를 색인하는 for문
-				log.println("[tistory-dl]검색중인 페이지 : " + pageNum);
+			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
+				if (Use_Sitemap) {
+					Node nNode = nList.item(pageNum_sitemap++);
+					nList
+					System.out.println("게시글 수 : " + pageNum_total);
+				} else
+					pageNum++;
+
+				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum+"/"+pageNum_total+" ("+(pageNum / pageNum_total) * 100.0 +"%)");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
@@ -306,8 +331,8 @@ public class Backup {
 					opt.delClass("kakao_head"); // 스크롤캡쳐시 상단바가 보이기 때문
 					opt.delClass("blogview_head"); // 스크롤캡쳐시 상단바가 보이기 때문
 					/* 잡다구리 삭제 */
-					opt.delClass("adsenseMobileAd1"); //구글광고
-					opt.delId("bannerWrap"); //카카오광고
+					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delId("bannerWrap"); // 카카오광고
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
