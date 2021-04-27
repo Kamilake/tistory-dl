@@ -111,8 +111,8 @@ public class Backup {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--window-size=800,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
-		// String downloadFilepath = "";
-		if (myDir.equals("")) {
+		String downloadFilepath = "";
+		if (myDir.equals("")) { //크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
 			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
 		} else {
 			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
@@ -171,6 +171,7 @@ public class Backup {
 
 					if (save.isDirExists(pageNum)) {
 						log.println("[tistory-dl] 페이지 " + pageNum + " 건너뛰기.");
+						emptyPageCount = 0;
 						continue;
 					}
 				}
@@ -302,9 +303,11 @@ public class Backup {
 				// log.println("완료");
 
 				try {
-					opt.delClass("kakao_head");
-					opt.delClass("blogview_head");
+					opt.delClass("kakao_head"); // 스크롤캡쳐시 상단바가 보이기 때문
+					opt.delClass("blogview_head"); // 스크롤캡쳐시 상단바가 보이기 때문
 					/* 잡다구리 삭제 */
+					opt.delClass("adsenseMobileAd1"); //구글광고
+					opt.delId("bannerWrap"); //카카오광고
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
