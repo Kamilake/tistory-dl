@@ -54,14 +54,14 @@ public class Backup {
 	static int pageNum_total = 0; //전체 페이지 수
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "";
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
 	static boolean Enable_Image_download = false;
 	static boolean Enable_Thumbnail_Screenshot = false;
 	static boolean Allow_Duplicate_Downloads = false;
-	static boolean Use_Sitemap = true;
+	static boolean Use_Sitemap = false;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
 
@@ -183,13 +183,13 @@ public class Backup {
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
 				if (Use_Sitemap) {
-					Node nNode = nList.item(pageNum_sitemap++);
-					nList
+					// Node nNode = nList.item(pageNum_sitemap++);
+					// nList;
 					System.out.println("게시글 수 : " + pageNum_total);
 				} else
 					pageNum++;
 
-				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum+"/"+pageNum_total+" ("+(pageNum / pageNum_total) * 100.0 +"%)");
+				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum+"/"+pageNum_total+" ("+((pageNum==0 ? 1: pageNum) / (pageNum_total ==0 ? 1 : pageNum_total)) * 100.0 +"%)");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
