@@ -51,7 +51,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
 	static int pageNum = 0;
-	static int pageNum_total = 0; //전체 페이지 수
+	static int pageNum_total = 99999; //전체 페이지 수
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "";
