@@ -202,7 +202,7 @@ public class Backup {
 							loc = opt.getTagValue("loc", eElement);
 							System.out.println("loc  : " + loc);
 							System.out.println("lastmod  : " + opt.getTagValue("lastmod", eElement));
-
+							// pageNum  = Integer.parseInt(loc.split("/")[loc.split("/").length - 1]); // loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지 왜만들었을까;; Deprecated
 							// if(loc) {
 							// 	.
 							// }
