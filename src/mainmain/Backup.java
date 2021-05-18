@@ -30,6 +30,8 @@ import org.openqa.selenium.chrome.ChromeOptions;
 import org.openqa.selenium.remote.CapabilityType;
 import org.openqa.selenium.remote.DesiredCapabilities;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
 
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
@@ -54,14 +56,14 @@ public class Backup {
 	static int pageNum_total = 99999; //전체 페이지 수
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "";
+	static String blogName = "bxmpe";
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
 	static boolean Enable_Image_download = false;
 	static boolean Enable_Thumbnail_Screenshot = false;
 	static boolean Allow_Duplicate_Downloads = false;
-	static boolean Use_Sitemap = false;
+	static boolean Use_Sitemap = true;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
 
@@ -84,7 +86,7 @@ public class Backup {
 		log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
 		log.println("[tistory-dl] 참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("[tistory-dl] 참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
-		// 크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다.
+		// 크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다. - 추가
 		log.println("\n[tistory-dl] tistory-dl" + Version + " - blog.Kamilake.com\n");
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
@@ -150,7 +152,8 @@ public class Backup {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 
 			/**
-			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용됩니다.이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인이 종료됩니다.
+			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용.
+				* 이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인 종료
 			 */
 			int emptyPageCount = 0;
 
@@ -172,20 +175,47 @@ public class Backup {
 			DocumentBuilderFactory dbFactoty = DocumentBuilderFactory.newInstance();
 			DocumentBuilder dBuilder = dbFactoty.newDocumentBuilder();
 			Document sitemap = null;
+			NodeList nList = null;
+			/**
+				* 페이지 원본 URL 저장(XML 파싱으로 얻은 주소)
+			 */
+			String loc = new String();
 			if (Use_Sitemap) {
 				sitemap = dBuilder.parse("https://" + blogName + ".tistory.com/sitemap.xml");
 				sitemap.getDocumentElement().normalize();
 				System.out.println("Root element: " + sitemap.getDocumentElement().getNodeName());
-				NodeList nList = sitemap.getElementsByTagName("url");
+				nList = sitemap.getElementsByTagName("url");
 				pageNum_total = nList.getLength();
 				System.out.println("게시글 수 : " + pageNum_total);
 			} 
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
 				if (Use_Sitemap) {
-					// Node nNode = nList.item(pageNum_sitemap++);
+					Node nNode = nList.item(pageNum_sitemap++);
 					// nList;
 					System.out.println("게시글 수 : " + pageNum_total);
+					
+						if(nNode.getNodeType() == Node.ELEMENT_NODE){
+							Element eElement = (Element)nNode;
+							System.out.println("######################");
+							//System.out.println(eElement.getTextContent());
+							loc = opt.getTagValue("loc", eElement);
+							System.out.println("loc  : " + loc);
+							System.out.println("lastmod  : " + opt.getTagValue("lastmod", eElement));
+
+							// if(loc) {
+							// 	.
+							// }
+					}	// if end
+
+
+
+
+
+
+
+
+
 				} else
 					pageNum++;
 

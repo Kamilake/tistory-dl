@@ -4,6 +4,9 @@ import static mainmain.Backup.driver;
 
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
+import org.w3c.dom.Element;
+import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 
 public class Optimize {
 
@@ -29,4 +32,14 @@ public class Optimize {
     System.out.println("아니 여기서 왜 에러가 나지");
   }
  }
+
+
+ public String getTagValue(String tag, Element eElement) {
+  NodeList nlList = ((Element) eElement).getElementsByTagName(tag).item(0).getChildNodes();
+  Node nValue = (Node) nlList.item(0);
+  if(nValue == null) 
+      return null;
+  return nValue.getNodeValue();
+}
+
 }
