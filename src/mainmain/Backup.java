@@ -342,8 +342,8 @@ public class Backup {
 					String metaData = "";
 					metaData += "Timestamp: [" + LocalDateTime.now() + "]\n";
 					metaData += "URL: " + opt.getMobileURL(loc[pageNum]) + "\n";
-					metaData += "Enable_Image_download: " + (Enable_Image_download ? "Enabled" : "Disabled" + "\n");
-					metaData += "Enable_Thumbnail_Screenshot: " + (Enable_Thumbnail_Screenshot ? "Enabled" : "Disabled" + "\n");
+					metaData += "Enable_Image_download: " + ((Enable_Image_download ? "Enabled" : "Disabled") + "\n");
+					metaData += "Enable_Thumbnail_Screenshot: " + ((Enable_Thumbnail_Screenshot ? "Enabled" : "Disabled") + "\n");
 					metaData += "HTB " + Version + "\n" + "blog.Kamilake.com";
 
 					titleElement = driver.findElement(By.className("blogview_tit"));
