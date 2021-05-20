@@ -41,7 +41,7 @@ import ru.yandex.qatools.ashot.Screenshot;
 
 public class Backup {
 
-	static String Version = "2021.03.16.a"; // 버전
+	static String Version = "2021.05.20"; // 버전
 	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
 	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
 	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
@@ -61,16 +61,16 @@ public class Backup {
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
-	static boolean Enable_Image_download = false;
-	static boolean Enable_Thumbnail_Screenshot = false;
+	static boolean Enable_Image_download = true;
+	static boolean Enable_Thumbnail_Screenshot = true;
 	static boolean Allow_Duplicate_Downloads = false;
-	static boolean Use_Sitemap = true;
+	public static boolean Use_Sitemap = true;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
 
 	float jpegParams_setCompressionQuality = 0.3f; // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
-
+	public static String loc[]; // sitemap.xml 태그의 loc 부분, PC버전 도메인(인터넷에 노출되는 메인 URL)
 	// TODO: https://hongmeilin.tistory.com/m/38 여기 크롤링에서 스킵하게 설정
 	String[] imgURL = new String[1000];
 	/**
@@ -179,7 +179,6 @@ public class Backup {
 			/**
 			 * 페이지 원본 URL 저장(XML 파싱으로 얻은 주소)
 			 */
-			String loc[];
 			if (Use_Sitemap) {
 				sitemap = dBuilder.parse("https://" + blogName + ".tistory.com/sitemap.xml");
 				sitemap.getDocumentElement().normalize();
@@ -197,13 +196,19 @@ public class Backup {
 						// System.out.println(eElement.getTextContent());
 						loc[i] = opt.getTagValue("loc", eElement);
 						System.out.println("loc  : " + loc[i]);
+
 						try {
 							System.out.println("lastmod  : " + opt.getTagValue("lastmod", eElement));
+							System.out.println("getMobileURL  : " + opt.getMobileURL(loc[i]));
+							System.out.println("getPostID  : " + opt.getPostID(loc[i]));
 						} catch (NullPointerException e) {
-							System.out.println("게시글이 아님  : " + loc[i]);
+							System.out.println("글이 아님  : " + loc[i]);
 							loc[i] = "무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
+						} catch (ArrayIndexOutOfBoundsException e2) {
+							System.out.println("글이지만 주소를 파싱할 수 없음  : " + loc[i]);
+							loc[i] = "무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
 						}
-						// pageNum = Integer.parseInt(loc.split("/")[loc.split("/").length - 1]); //
+						// pageNum = (loc.split("/")[loc.split("/").length - 1]); //
 						// loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지
 						// 왜만들었을까;; Deprecated
 						// if(loc) {
@@ -221,11 +226,13 @@ public class Backup {
 					// nList;
 					// System.out.println("게시글 수 : " + pageNum_total);
 
-				} else
-					pageNum++;
+				} else {
+				}
+				pageNum++;
 
 				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum + "/" + pageNum_total + " ("
-						+ ((pageNum == 0 ? 1 : pageNum) / (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0 + "%)");
+						+ (float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0
+						+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
@@ -249,10 +256,10 @@ public class Backup {
 				}
 				// 무시해야 하는 페이지인지 확인하는 부분 끝.
 				if (Use_Sitemap) {
-				driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum);
-				}
-				else driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum); //TODO: aa
-				
+					driver.navigate().to(opt.getMobileURL(loc[pageNum]));
+				} else
+					driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum); // TODO: aa
+
 				// liveBtn = driver.findElement(By.id("txtSource"));
 				// liveBtn.click();
 				// driver.navigate().to("https://naver.com/");
@@ -334,7 +341,7 @@ public class Backup {
 					WebElement titleElement;
 					String metaData = "";
 					metaData += "Timestamp: [" + LocalDateTime.now() + "]\n";
-					metaData += "https://" + blogName + ".tistory.com/m/" + pageNum + "\n";
+					metaData += "URL: " + opt.getMobileURL(loc[pageNum]) + "\n";
 					metaData += "Enable_Image_download: " + (Enable_Image_download ? "Enabled" : "Disabled" + "\n");
 					metaData += "Enable_Thumbnail_Screenshot: " + (Enable_Thumbnail_Screenshot ? "Enabled" : "Disabled" + "\n");
 					metaData += "HTB " + Version + "\n" + "blog.Kamilake.com";

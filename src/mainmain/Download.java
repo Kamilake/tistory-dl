@@ -37,7 +37,8 @@ public class Download {
 	public static void observeCompleteDL(String targetDirectory, long polltimeout, TimeUnit polltimeunit)
 			throws InterruptedException {
 		Log log = new Log();
-		// targetDirectory = "D:/Users/exjang/Documents/GitHub/Hyper_Tistory_Backupper/DownloadTemp/";
+		// targetDirectory =
+		// "D:/Users/exjang/Documents/GitHub/Hyper_Tistory_Backupper/DownloadTemp/";
 		try {
 
 			WatchService fileWatchService = FileSystems.getDefault().newWatchService();
@@ -61,30 +62,32 @@ public class Download {
 				for (WatchEvent<?> event : watchKey.pollEvents()) {
 					// System.out.println("aa :" + event.context().toString() + " , time : " +
 					// LocalDateTime.now());
-					try{
-					if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
-						String fileName = event.context().toString();
-						if (FilenameUtils.getExtension(fileName).equals("crdownload") || FilenameUtils.getExtension(fileName).equals("tmp")) {// 아직 다운중
-							log.println("[첨부파일] 다운로드 시작 :" + fileName);
+					try {
+						if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+							String fileName = event.context().toString();
+							if (FilenameUtils.getExtension(fileName).equals("crdownload")
+									|| FilenameUtils.getExtension(fileName).equals("tmp")) {// 아직 다운중
+								log.println("[첨부파일] 다운로드 시작 :" + fileName);
+							} else {
+								log.println("[첨부파일] 다운로드 완료 :" + fileName);
+								watchKey.reset();
+								watchKey.cancel();
+								watchKey.reset();
+								watchKey.cancel();
+								return;
+							}
+
+							// if(FilenameUtils.getExtension(fileName));
+
 						} else {
-							log.println("[첨부파일] 다운로드 완료 :" + fileName);
-							watchKey.reset();
-							watchKey.cancel();
-							watchKey.reset();
-							watchKey.cancel();
-							return;
+							log.println("UNKNOWN EVENT ......");
 						}
-
-						// if(FilenameUtils.getExtension(fileName));
-
-					} else {
-						log.println("UNKNOWN EVENT ......");
+					} catch (Exception e3) {
+						System.out.println("[첨부파일] 실패 - 알 수 없음 (남은 재시도 횟수 : " + ttl2-- + ")");
+						if (ttl2 == 0)
+							break;
+						continue;
 					}
-				} catch (Exception e3){
-					System.out.println("[첨부파일] 실패 - 알 수 없음 (남은 재시도 횟수 : " + ttl2-- + ")");
-					if(ttl2 == 0) break;
-					continue;
-				}
 				}
 				valid = watchKey.reset();
 
@@ -157,9 +160,9 @@ public class Download {
 			// 있을지도? 아직 테스트해보지 않았다.@@@@
 			uCon.connect();
 			String extension_raw = uCon.getHeaderField("Content-Disposition"); // TODO: 한글 받아오면 깨진다.
-			
+
 			extension_raw = URLDecoder.decode(new String(extension_raw.getBytes("ISO-8859-1"), "UTF-8"), "UTF-8");
-			
+
 			// 헤더예시 --> Content-Disposition: inline; filename="008.png";
 			// filename*=UTF-8''008.png
 			// raw = "attachment; filename=abc.jpg"

@@ -3,18 +3,25 @@ package mainmain;
 import java.io.File;
 import static mainmain.Backup.myDir;
 import static mainmain.Backup.blogName;
+import static mainmain.Backup.Use_Sitemap;
+import static mainmain.Backup.loc;
 
 /** 버퍼 또는 캐시에 저장된 데이터를 디스크에 영구적으로 저장하는 것과 관련된 정보를 저장하고 있습니다. */
 public class Save {
+	Optimize opt = new Optimize();
 
 	/** 페이지 번호를 주면 전체 절대경로를 반환합니다. @param 페이지번호 */
 	public String saveDir(int pageNum) { // 페이지 번호로 저장 경로지정
 		// Log log = new Log();
 		// String blogName = "testblog2";
 		// String myDir = "";
+		String postId;
+		if (Use_Sitemap) {
+			postId = opt.getPostID(loc[pageNum]);
+		} else
+			postId = pageNum + "";
 
-		String path = myDir + "Backup/" + blogName + "/" + pageNum;
-
+		String path = myDir + "Backup/" + blogName + "/" + postId;
 		File folder = new File(path);
 		if (!folder.exists()) {
 			File blogroot = new File(myDir + "Backup/" + blogName);
@@ -30,7 +37,13 @@ public class Save {
 	}
 
 	public boolean isDirExists(int pageNum) { // 페이지 번호로 저장 경로지정
-		String path = myDir + "Backup/" + blogName + "/" + pageNum;
+		String postId;
+		if (Use_Sitemap) {
+			postId = opt.getPostID(loc[pageNum]);
+		} else
+			postId = pageNum + "";
+
+		String path = myDir + "Backup/" + blogName + "/" + postId;
 
 		File folder = new File(path);
 		if (folder.exists())

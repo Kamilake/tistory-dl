@@ -10,36 +10,45 @@ import org.w3c.dom.NodeList;
 
 public class Optimize {
 
- public int delClass(String className01) {
-  JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
-  js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-    driver.findElement(By.className(className01)));
-  return 0;
- }
-
- public int delId(String idName01) {
-  JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
-  js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-    driver.findElement(By.id(idName01)));
-  return 0;
- }
-
- public void delay(int millis) {
-
-  try {
-    Thread.sleep(millis);
-  } catch (Exception e) {
-    System.out.println("아니 여기서 왜 에러가 나지");
+  public int delClass(String className01) {
+    JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
+    js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+        driver.findElement(By.className(className01)));
+    return 0;
   }
- }
 
+  public int delId(String idName01) {
+    JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
+    js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
+        driver.findElement(By.id(idName01)));
+    return 0;
+  }
 
- public String getTagValue(String tag, Element eElement) {
-  NodeList nlList = ((Element) eElement).getElementsByTagName(tag).item(0).getChildNodes();
-  Node nValue = (Node) nlList.item(0);
-  if(nValue == null) 
+  public void delay(int millis) {
+
+    try {
+      Thread.sleep(millis);
+    } catch (Exception e) {
+      System.out.println("아니 여기서 왜 에러가 나지");
+    }
+  }
+
+  public String getTagValue(String tag, Element eElement) {
+    NodeList nlList = ((Element) eElement).getElementsByTagName(tag).item(0).getChildNodes();
+    Node nValue = (Node) nlList.item(0);
+    if (nValue == null)
       return null;
-  return nValue.getNodeValue();
-}
+    return nValue.getNodeValue();
+  }
 
+  public String getMobileURL(String url) {
+
+    return (url.split("//")[0]) + "//" + (url.split("//")[1]).split("/")[0] + "/m/"
+        + (url.split("//")[1]).split("/")[1];
+  }
+
+  public String getPostID(String url) {
+
+    return (url.split("/")[url.split("/").length - 1]);
+  }
 }
