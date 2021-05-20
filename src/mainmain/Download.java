@@ -161,12 +161,12 @@ public class Download {
 			uCon.connect();
 			String extension_raw = uCon.getHeaderField("Content-Disposition"); // TODO: 한글 받아오면 깨진다.
 
-			extension_raw = URLDecoder.decode(new String(extension_raw.getBytes("ISO-8859-1"), "UTF-8"), "UTF-8");
 
 			// 헤더예시 --> Content-Disposition: inline; filename="008.png";
 			// filename*=UTF-8''008.png
 			// raw = "attachment; filename=abc.jpg"
 			if (extension_raw != null && extension_raw.indexOf("filename=\"") != -1) {
+				extension_raw = URLDecoder.decode(new String(extension_raw.getBytes("ISO-8859-1"), "UTF-8"), "UTF-8");
 				String netFileName = extension_raw.split("filename=\"")[1]; // getting value after '='
 				netFileName = netFileName.split("\"")[0];
 				netFileName = netFileName.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
