@@ -33,6 +33,7 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.apache.commons.lang3.ArrayUtils;
 
 import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.AShot;
@@ -53,7 +54,7 @@ public class Backup {
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
 	static int pageNum = 0;
-	static int pageNum_total = 99999; //전체 페이지 수
+	static int pageNum_total = 99999; // 전체 페이지 수
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
 	static String blogName = "bxmpe";
@@ -152,8 +153,7 @@ public class Backup {
 			driver.get("https://" + blogName + ".tistory.com/m/");
 
 			/**
-			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용.
-				* 이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인 종료
+			 * 이 변수는 연속되는 빈 페이지를 확인할 때 사용. 이 값이 임계값(emptyPageCheckLimit)에 도달하면 색인 종료
 			 */
 			int emptyPageCount = 0;
 
@@ -177,9 +177,9 @@ public class Backup {
 			Document sitemap = null;
 			NodeList nList = null;
 			/**
-				* 페이지 원본 URL 저장(XML 파싱으로 얻은 주소)
+			 * 페이지 원본 URL 저장(XML 파싱으로 얻은 주소)
 			 */
-			String loc = new String();
+			String loc[];
 			if (Use_Sitemap) {
 				sitemap = dBuilder.parse("https://" + blogName + ".tistory.com/sitemap.xml");
 				sitemap.getDocumentElement().normalize();
@@ -187,39 +187,45 @@ public class Backup {
 				nList = sitemap.getElementsByTagName("url");
 				pageNum_total = nList.getLength();
 				System.out.println("게시글 수 : " + pageNum_total);
-			} 
+				loc = new String[pageNum_total - 1 + 1]; // 게시글 수만큼 선언해두기
+				for (int i = 0; i != pageNum_total; i++) {
+					System.out.println("######################");
+					log.println("i=" + i);
+					Node nNode = nList.item(i); // xml파일 전체에서"url"항목의 pageNum_sitemap++번째의 노드를 가져오기
+					if (nNode.getNodeType() == Node.ELEMENT_NODE) {
+						Element eElement = (Element) nNode;
+						// System.out.println(eElement.getTextContent());
+						loc[i] = opt.getTagValue("loc", eElement);
+						System.out.println("loc  : " + loc[i]);
+						try {
+							System.out.println("lastmod  : " + opt.getTagValue("lastmod", eElement));
+						} catch (NullPointerException e) {
+							System.out.println("게시글이 아님  : " + loc[i]);
+							loc[i] = "무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
+						}
+						// pageNum = Integer.parseInt(loc.split("/")[loc.split("/").length - 1]); //
+						// loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지
+						// 왜만들었을까;; Deprecated
+						// if(loc) {
+						// .
+						// }
+					} // if end
+				}
+				ArrayUtils.reverse(loc);
+				// System.out.println(Arrays.toString(loc)); 모든주소 출력
+			} else
+				loc = new String[1]; // 사이트맵 안 쓰는 경우 대충 아무거나 채워넣기
 			// Thread.sleep(5000);
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
 				if (Use_Sitemap) {
-					Node nNode = nList.item(pageNum_sitemap++);
 					// nList;
-					System.out.println("게시글 수 : " + pageNum_total);
-					
-						if(nNode.getNodeType() == Node.ELEMENT_NODE){
-							Element eElement = (Element)nNode;
-							System.out.println("######################");
-							//System.out.println(eElement.getTextContent());
-							loc = opt.getTagValue("loc", eElement);
-							System.out.println("loc  : " + loc);
-							System.out.println("lastmod  : " + opt.getTagValue("lastmod", eElement));
-							// pageNum  = Integer.parseInt(loc.split("/")[loc.split("/").length - 1]); // loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지 왜만들었을까;; Deprecated
-							// if(loc) {
-							// 	.
-							// }
-					}	// if end
-
-
-
-
-
-
-
-
+					// System.out.println("게시글 수 : " + pageNum_total);
 
 				} else
 					pageNum++;
 
-				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum+"/"+pageNum_total+" ("+((pageNum==0 ? 1: pageNum) / (pageNum_total ==0 ? 1 : pageNum_total)) * 100.0 +"%)");
+				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum + "/" + pageNum_total + " ("
+						+ ((pageNum == 0 ? 1 : pageNum) / (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0 + "%)");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
@@ -232,7 +238,21 @@ public class Backup {
 				}
 				// 이미 다운로드한 페이지인지 확인하는 부분 끝.
 
+				// 무시해야 하는 페이지인지 확인하는 부분 시작
+				if (loc[pageNum].equals("무시무시")) {
+
+					if (save.isDirExists(pageNum)) {
+						log.println("[tistory-dl] 페이지 " + pageNum + " 무시.");
+						emptyPageCount = 0;
+						continue;
+					}
+				}
+				// 무시해야 하는 페이지인지 확인하는 부분 끝.
+				if (Use_Sitemap) {
 				driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum);
+				}
+				else driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum); //TODO: aa
+				
 				// liveBtn = driver.findElement(By.id("txtSource"));
 				// liveBtn.click();
 				// driver.navigate().to("https://naver.com/");
