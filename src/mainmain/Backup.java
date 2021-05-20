@@ -247,12 +247,9 @@ public class Backup {
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
 				if (loc[pageNum].equals("무시무시")) {
-
-					if (save.isDirExists(pageNum)) {
 						log.println("[tistory-dl] 페이지 " + pageNum + " 무시.");
 						emptyPageCount = 0;
 						continue;
-					}
 				}
 				// 무시해야 하는 페이지인지 확인하는 부분 끝.
 				if (Use_Sitemap) {
