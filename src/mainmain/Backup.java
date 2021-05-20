@@ -231,7 +231,7 @@ public class Backup {
 				pageNum++;
 
 				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum + "/" + pageNum_total + " ("
-						+ (float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0
+						+ String.format("%.2f",(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
 						+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
