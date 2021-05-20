@@ -5,6 +5,7 @@ import java.io.InputStream;
 import java.io.OutputStream;
 import java.net.URL;
 import java.net.URLConnection;
+import java.net.URLDecoder;
 import java.nio.file.WatchService;
 import java.text.CharacterIterator;
 import java.text.StringCharacterIterator;
@@ -156,7 +157,9 @@ public class Download {
 			// 있을지도? 아직 테스트해보지 않았다.@@@@
 			uCon.connect();
 			String extension_raw = uCon.getHeaderField("Content-Disposition"); // TODO: 한글 받아오면 깨진다.
-
+			
+			extension_raw = URLDecoder.decode(new String(extension_raw.getBytes("ISO-8859-1"), "UTF-8"), "UTF-8");
+			
 			// 헤더예시 --> Content-Disposition: inline; filename="008.png";
 			// filename*=UTF-8''008.png
 			// raw = "attachment; filename=abc.jpg"
