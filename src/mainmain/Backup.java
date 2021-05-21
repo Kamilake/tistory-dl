@@ -221,6 +221,7 @@ public class Backup {
 			} else
 				loc = new String[1]; // 사이트맵 안 쓰는 경우 대충 아무거나 채워넣기
 			// Thread.sleep(5000);
+			pageNum = -1; // 아래에서 0으로 바뀜
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
 				if (Use_Sitemap) {
 					// nList;
@@ -230,8 +231,14 @@ public class Backup {
 				}
 				pageNum++;
 
-				log.println("[tistory-dl] 검색중인 페이지 : " + pageNum + "/" + pageNum_total + " ("
-						+ String.format("%.2f",(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
+				if (pageNum == pageNum_total) {
+					log.println("\n\n\n[tistory-dl] 백업이 모두 완료되었습니다.");
+					driver.close();
+					return; // 종료.
+				}
+				log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " ("
+						+ String.format("%.2f",
+								(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
 						+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
@@ -247,9 +254,9 @@ public class Backup {
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
 				if (loc[pageNum].equals("무시무시")) {
-						log.println("[tistory-dl] 페이지 " + pageNum + " 무시.");
-						emptyPageCount = 0;
-						continue;
+					log.println("[tistory-dl] 페이지 " + pageNum + " 무시.");
+					emptyPageCount = 0;
+					continue;
 				}
 				// 무시해야 하는 페이지인지 확인하는 부분 끝.
 				if (Use_Sitemap) {
