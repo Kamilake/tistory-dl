@@ -57,7 +57,7 @@ public class Backup {
 	static int pageNum_total = 99999; // 전체 페이지 수
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
 	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
-	static String blogName = "bxmpe";
+	static String blogName = "";
 	/** 암호걸린 게시글의 암호 해독 */
 	static String password = "1111";
 
@@ -291,6 +291,7 @@ public class Backup {
 
 							if (emptyPageCount == emptyPageCheckLimit) {
 								log.println("\n\n\n[tistory-dl] 백업이 모두 완료되었습니다.");
+								driver.close();
 								return; // 종료.
 							}
 						} else {
@@ -613,10 +614,6 @@ public class Backup {
 
 			e.printStackTrace();
 			log.println(e);
-			try {
-				Thread.sleep(10000);
-			} catch (InterruptedException ee) {
-			}
 		}
 
 		driver.close();
