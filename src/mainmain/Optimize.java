@@ -43,8 +43,7 @@ public class Optimize {
 
   public String getMobileURL(String url) {
 
-    return (url.split("//")[0]) + "//" + (url.split("//")[1]).split("/")[0] + "/m/"
-        + (url.split("//")[1]).split("/")[1];
+    return url.replace(".tistory.com/",".tistory.com/m/");
   }
 
   public String getPostID(String url) {
