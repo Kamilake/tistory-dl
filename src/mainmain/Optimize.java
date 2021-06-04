@@ -35,8 +35,11 @@ public class Optimize {
     }
   }
 
-  public S netFileName.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
-  .replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞")
+  public String escapeWindowsFilename(String string)
+  {
+   return string.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
+  .replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞");
+  }
 
   public String getTagValue(String tag, Element eElement) {
     NodeList nlList = ((Element) eElement).getElementsByTagName(tag).item(0).getChildNodes();
@@ -53,6 +56,6 @@ public class Optimize {
 
   public String getPostID(String url) {
 
-    return URLDecoder.decode(url.split("/")[url.split("/").length - 1], "UTF-8");
+    return url.split("/")[url.split("/").length - 1];
   }
 }
