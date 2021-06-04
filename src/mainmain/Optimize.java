@@ -2,6 +2,8 @@ package mainmain;
 
 import static mainmain.Backup.driver;
 
+import java.net.URLDecoder;
+
 import org.openqa.selenium.By;
 import org.openqa.selenium.JavascriptExecutor;
 import org.w3c.dom.Element;
@@ -33,6 +35,9 @@ public class Optimize {
     }
   }
 
+  public S netFileName.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
+  .replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞")
+
   public String getTagValue(String tag, Element eElement) {
     NodeList nlList = ((Element) eElement).getElementsByTagName(tag).item(0).getChildNodes();
     Node nValue = (Node) nlList.item(0);
@@ -48,6 +53,6 @@ public class Optimize {
 
   public String getPostID(String url) {
 
-    return (url.split("/")[url.split("/").length - 1]);
+    return URLDecoder.decode(url.split("/")[url.split("/").length - 1], "UTF-8");
   }
 }
