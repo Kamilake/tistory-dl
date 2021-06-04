@@ -261,6 +261,7 @@ public class Backup {
 				// 무시해야 하는 페이지인지 확인하는 부분 끝.
 				if (Use_Sitemap) {
 					driver.navigate().to(opt.getMobileURL(loc[pageNum]));
+					log.println((opt.getMobileURL(loc[pageNum])));
 				} else
 					driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum); // TODO: aa
 
