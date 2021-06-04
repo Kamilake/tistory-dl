@@ -119,7 +119,7 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
-		options.addArguments("--window-size=800,3000");
+		options.addArguments("--window-size=600,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) { // 크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
@@ -261,6 +261,7 @@ public class Backup {
 				// 무시해야 하는 페이지인지 확인하는 부분 끝.
 				if (Use_Sitemap) {
 					driver.navigate().to(opt.getMobileURL(loc[pageNum]));
+					log.println((opt.getMobileURL(loc[pageNum])));
 				} else
 					driver.navigate().to("https://" + blogName + ".tistory.com/m/" + pageNum); // TODO: aa
 
