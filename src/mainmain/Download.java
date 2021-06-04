@@ -144,10 +144,11 @@ public class Download {
 	 */
 	public void fileUrlReadAndDownload(String fileAddress, String localFileName, String downloadDir, int imgNum) {
 		Log log = new Log();
+		Optimize opt = new Optimize();
 		OutputStream outStream = null;
 		URLConnection uCon = null;
-
 		InputStream is = null;
+
 		try {
 			URL Url;
 			byte[] buf;
@@ -169,8 +170,7 @@ public class Download {
 				extension_raw = URLDecoder.decode(new String(extension_raw.getBytes("ISO-8859-1"), "UTF-8"), "UTF-8");
 				String netFileName = extension_raw.split("filename=\"")[1]; // getting value after '='
 				netFileName = netFileName.split("\"")[0];
-				netFileName = netFileName.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
-						.replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞");
+				netFileName = opt.escapeWindowsFilename(netFileName);
 				log.println("[파일] 원본 파일 이름 : " + netFileName);
 				// netFileName = netFileName.split("\\.")[1]; //getting value after '.'
 				// log.println("[파일] 원본 파일 확장자 : " + netFileName);
