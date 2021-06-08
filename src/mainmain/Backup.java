@@ -333,8 +333,10 @@ public class Backup {
 							// 위는 테스트 안됨 - 비번 체크 로직
 
 						} catch (Exception e3) {
+							e3.printStackTrace();
 							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
-							System.in.read();
+							//System.in.read();
+							opt.delay(10000);
 						}
 
 					}
