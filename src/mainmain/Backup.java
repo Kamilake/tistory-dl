@@ -543,7 +543,7 @@ public class Backup {
 				writer.write(innerHTML);
 				writer.close();
 				log.println("완료");
-				///////////// 첨부파일 다운로드 영역 시작
+				//////////// 첨부파일 다운로드 영역 시작
 				for (int i = 0; i < 1000; i++) { /// 이미지 다운로드가 아니라 첨부파일 다운로더
 					JavascriptExecutor js_del_nonfile = (JavascriptExecutor) driver;
 
