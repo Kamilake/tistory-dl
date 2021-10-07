@@ -254,7 +254,7 @@ public class Backup {
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
 				if (loc[pageNum].equals("무시무시")) {
-					log.println("[tistory-dl] 페이지 " + pageNum + " 무시.");
+					log.println("[tistory-dl] 페이지 " + loc[pageNum] + " 무시.");
 					emptyPageCount = 0;
 					continue;
 				}
@@ -398,6 +398,8 @@ public class Backup {
 					/* 잡다구리 삭제 */
 					opt.delClass("adsenseMobileAd1"); // 구글광고
 					opt.delId("bannerWrap"); // 카카오광고
+					opt.delId("area_ad"); // 카카오광고
+					
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
