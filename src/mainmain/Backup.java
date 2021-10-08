@@ -203,10 +203,10 @@ public class Backup {
 							System.out.println("getPostID  : " + opt.getPostID(loc[i]));
 						} catch (NullPointerException e) {
 							System.out.println("글이 아님  : " + loc[i]);
-							loc[i] = loc[i]+".무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
+							loc[i] = loc[i] + ".무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
 						} catch (ArrayIndexOutOfBoundsException e2) {
 							System.out.println("글이지만 주소를 파싱할 수 없음  : " + loc[i]);
-							loc[i] = loc[i]+".무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
+							loc[i] = loc[i] + ".무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
 						}
 						// pageNum = (loc.split("/")[loc.split("/").length - 1]); //
 						// loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지
@@ -236,9 +236,8 @@ public class Backup {
 					driver.close();
 					return; // 종료.
 				}
-				log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " ("
-						+ String.format("%.2f",
-								(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
+				log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " (" + String.format("%.2f",
+						(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
 						+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
@@ -334,8 +333,9 @@ public class Backup {
 
 						} catch (Exception e3) {
 							e3.printStackTrace();
-							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
-							//System.in.read();
+							log.println(
+									"[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							// System.in.read();
 							opt.delay(10000);
 						}
 
@@ -399,7 +399,7 @@ public class Backup {
 					opt.delClass("adsenseMobileAd1"); // 구글광고
 					opt.delId("bannerWrap"); // 카카오광고
 					opt.delId("area_ad"); // 카카오광고
-					
+
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
@@ -414,7 +414,8 @@ public class Backup {
 					for (int comment_i = 0; comment_i < 100; comment_i++) {
 						log.print("[댓글] 댓글 펼치는 중..." + comment_i);
 						// driver.findElement(By.className("link_cmtmore")).click();
-						((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
+						((JavascriptExecutor) driver)
+								.executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
 						opt.delay(delayFileDL);
 						log.println("");
 					}
@@ -433,19 +434,22 @@ public class Backup {
 					// 모바일상단바.isDisplayed();
 
 					try {
-						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
+						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10))
+								.takeScreenshot(driver);
 						final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
 						// specifies where the jpg image has to be written
 						imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
 
 						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
-						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
+						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f
+																																								// ->100%
 
 						// writes the file with given compression level
 						// from your JPEGImageWriteParam instance
-						imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다. 예외 발생시
-																																																																																					// 직접 기록하는 코드 필요
+						imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다.
+																																														// 예외 발생시
+																																														// 직접 기록하는 코드 필요
 
 						// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
 						// File(".\\fullimage.webp"));
@@ -527,7 +531,7 @@ public class Backup {
 							// imgNum + ".jpg");
 
 							innerHTML = innerHTML.replace("src=\"//", "src=\"https://"); // myskrpatch를 보니까 주소가 <img
-																																																																				// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
+																																						// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
 							innerHTML = innerHTML.replace("&amp;", "&").replace(imgURL[imgNum], imageRealname[imgNum]);
 							log.println("교체대상 : " + imgURL[imgNum]);
 							log.println("교체전주소 : " + "img" + imgNum + ".jpg");

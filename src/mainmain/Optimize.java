@@ -33,10 +33,9 @@ public class Optimize {
     }
   }
 
-  public String escapeWindowsFilename(String string)
-  {
-   return string.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂")
-  .replace("/", "／").replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞");
+  public String escapeWindowsFilename(String string) {
+    return string.replace("\"", "＂").replace("\\", "＼").replace(":", "：").replace("\"", "＂").replace("/", "／")
+        .replace("|", "｜").replace("*", "＊").replace("?", "？").replace("<", "＜").replace(">", "＞");
   }
 
   public String getTagValue(String tag, Element eElement) {
@@ -49,7 +48,7 @@ public class Optimize {
 
   public String getMobileURL(String url) {
 
-    return url.replace(".tistory.com/",".tistory.com/m/");
+    return url.replace(".tistory.com/", ".tistory.com/m/");
   }
 
   public String getPostID(String url) {
