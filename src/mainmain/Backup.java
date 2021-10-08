@@ -203,10 +203,10 @@ public class Backup {
 							System.out.println("getPostID  : " + opt.getPostID(loc[i]));
 						} catch (NullPointerException e) {
 							System.out.println("글이 아님  : " + loc[i]);
-							loc[i] = "무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
+							loc[i] = loc[i]+".무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
 						} catch (ArrayIndexOutOfBoundsException e2) {
 							System.out.println("글이지만 주소를 파싱할 수 없음  : " + loc[i]);
-							loc[i] = "무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
+							loc[i] = loc[i]+".무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
 						}
 						// pageNum = (loc.split("/")[loc.split("/").length - 1]); //
 						// loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지
@@ -253,8 +253,8 @@ public class Backup {
 				// 이미 다운로드한 페이지인지 확인하는 부분 끝.
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
-				if (loc[pageNum].equals("무시무시")) {
-					log.println("[tistory-dl] 페이지 " + loc[pageNum] + " 무시.");
+				if (loc[pageNum].contains(".무시무시")) {
+					log.println("[tistory-dl] 페이지 " + loc[pageNum] + "(id:"+pageNum+") 무시.");
 					emptyPageCount = 0;
 					continue;
 				}
