@@ -254,7 +254,7 @@ public class Backup {
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
 				if (loc[pageNum].contains(".무시무시")) {
-					log.println("[tistory-dl] 페이지 " + loc[pageNum] + "(id:"+pageNum+") 무시.");
+					log.println("[tistory-dl] 페이지 " + loc + " 무시.");
 					emptyPageCount = 0;
 					continue;
 				}
