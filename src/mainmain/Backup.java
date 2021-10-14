@@ -96,8 +96,21 @@ public class Backup {
 			blogName = scan.nextLine();
 		} else
 			log.println(blogName);
+		// Backup backup = new Backup();
+		// backup.crawl();
 		Backup backup = new Backup();
+
+		blogName = "bxmpe";
 		backup.crawl();
+
+		blogName = "irootkr";
+		backup.crawl();
+
+		// blogName = "";
+		// backup.crawl();
+
+
+		
 		scan.close();
 	}
 
@@ -119,6 +132,7 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--window-size=600,3000");
 		options.addArguments("--window-size=600,3000");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
@@ -234,6 +248,10 @@ public class Backup {
 				if (pageNum == pageNum_total) {
 					log.println("\n\n\n[tistory-dl] 백업이 모두 완료되었습니다.");
 					driver.close();
+					pageNum = 0;
+					pageNum_total = 99999;
+					pageNum_sitemap = 0;
+	
 					return; // 종료.
 				}
 				log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " (" + String.format("%.2f",
@@ -281,7 +299,7 @@ public class Backup {
 				JavascriptExecutor js_dellike = (JavascriptExecutor) driver;
 				try {
 					js_dellike.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
-							driver.findElement(By.className("container_postbtn")));
+							driver.findElement(By.className("doc-header")));
 				} catch (Exception e) {
 
 					try {
@@ -403,12 +421,19 @@ public class Backup {
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
-					opt.delClass("cmt_write"); // 댓글작성칸 삭제
-					// opt.delId("comment"))); // 댓글삭제
+					opt.delClass("tit_post"); //"~카테고리의 다른 글" 이라고 적힌 문단
+					opt.delClass("list_post"); //"~카테고리의 다른 글" 속 섬네일들
+					opt.delClass("tit_post"); //"이 블로그 인기글" 이라고 적힌 문단
+					opt.delClass("list_thumb"); //이 블로그 인기글 속 섬네일들
+					opt.delClass("bottomBar"); //화면아래 고정으로 따라다니는 하트 댓글 공유버튼있는 막대
+					opt.delClass("doc-footer"); //티스토리|로그아웃|고객센터 그리고 잡다한 잔소리들
+					opt.delClass("cmt_write"); // 댓글작성칸
+					// opt.delId("comment"))); // 댓글
 					/* 잡다구리 삭제 끝 */
 				} catch (Exception e) {
 					// TODO: handle exception
 					// 잡다한 서식 삭제 중 문제 생기면 오는 곳.
+					e.printStackTrace();
 				}
 				try { // 댓글펼치기 누르기
 					for (int comment_i = 0; comment_i < 100; comment_i++) {
