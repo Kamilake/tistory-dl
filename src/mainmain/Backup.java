@@ -103,6 +103,7 @@ public class Backup {
 		blogName = "bxmpe";
 		backup.crawl();
 
+		backup = new Backup();
 		blogName = "irootkr";
 		backup.crawl();
 
@@ -111,7 +112,9 @@ public class Backup {
 
 
 		
+
 		scan.close();
+		System.out.println("종료됨.");
 	}
 
 	// WebDriver
@@ -132,8 +135,9 @@ public class Backup {
 
 		System.setProperty(WEB_DRIVER_ID, WEB_DRIVER_PATH);
 		ChromeOptions options = new ChromeOptions();
+		options.addArguments("--no-sandbox");
 		options.addArguments("--window-size=600,3000");
-		options.addArguments("--window-size=600,3000");
+		options.addArguments("user-agent=Mozilla/5.0 (Linux; Android 10; SM-F916N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.85 Mobile Safari/537.36;KAKAOTALK 2109180");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) { // 크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
@@ -141,7 +145,6 @@ public class Backup {
 		} else {
 			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
 		}
-
 		HashMap<String, Object> chromePrefs = new HashMap<String, Object>();
 		chromePrefs.put("profile.default_content_settings.popups", 0);
 		chromePrefs.put("download.default_directory", downloadFilepath);
@@ -656,8 +659,13 @@ public class Backup {
 			e.printStackTrace();
 			log.println(e);
 		}
-
-		driver.close();
+try {
+	driver.close();
+} catch (Exception e) {
+	//TODO: handle exception
+	log.println("몬가 몬가 아주 심각한 오류가 발생한 걸지도");
+}
+		
 
 		return;
 	}
