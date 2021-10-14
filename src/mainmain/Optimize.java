@@ -56,18 +56,11 @@ public class Optimize {
 
   public String getMobileURL(String url) {
 
-    if (url.contains(".tistory.com/")) {
-      return url.replace(".tistory.com/", ".tistory.com/m/");
-    }
-    if (url.contains(".com/")) {
-      return url.replace(".com/", ".com/m/");
-    }
-    if (url.contains(".kr/")) {
-      return url.replace(".kr/", ".kr/m/");
-    }
-    if (url.contains(".net/")) {
-      return url.replace(".net/", ".net/m/");
-    }
+    System.out.println(url);
+    String[] urlsplt = url.split("/");
+    urlsplt[2] = urlsplt[2] + "/m";
+    // [2]는 ://다음의 도메인 오는 번째의 배열
+    url = String.join("/", urlsplt);
     // Log log = new log(Log.log);
     return url;
   }
