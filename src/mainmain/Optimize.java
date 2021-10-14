@@ -11,16 +11,20 @@ import org.w3c.dom.NodeList;
 public class Optimize {
 
   public int delClass(String className01) {
+    try{
     JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
     js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
         driver.findElement(By.className(className01)));
+    } catch (Exception e){return -1;}
     return 0;
   }
 
   public int delId(String idName01) {
+    try{
     JavascriptExecutor js_UI청소 = (JavascriptExecutor) driver;
     js_UI청소.executeScript("var element = arguments[0]; element.parentNode.removeChild(element);",
         driver.findElement(By.id(idName01)));
+      } catch (Exception e){return -1;}
     return 0;
   }
 
