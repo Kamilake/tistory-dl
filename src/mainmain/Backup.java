@@ -44,7 +44,7 @@ public class Backup {
 	static String Version = "2021.05.20"; // 버전
 	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
 	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
-	static int emptyPageCheckLimit = 40; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
+	static int emptyPageCheckLimit = 150; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
 	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
@@ -104,14 +104,87 @@ public class Backup {
 		backup.crawl();
 
 		backup = new Backup();
+		blogName = "anigil";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "ehasd6";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "felia";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "fuko";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "hongmeilin";
+		backup.crawl();
+
+		backup = new Backup();
 		blogName = "irootkr";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "kamimusic";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "myskrpatch";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "nx0084";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "oogundam";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "prisis";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "seok-factory";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "sjdktp";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "skdlsgh0654";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "slugcat";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "spiritualize";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "stadtfeld";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "tosso";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "yarnzero";
+		backup.crawl();
+
+		backup = new Backup();
+		blogName = "yesbungalow";
 		backup.crawl();
 
 		// blogName = "";
 		// backup.crawl();
-
-
-		
 
 		scan.close();
 		System.out.println("종료됨.");
@@ -137,7 +210,8 @@ public class Backup {
 		ChromeOptions options = new ChromeOptions();
 		options.addArguments("--no-sandbox");
 		options.addArguments("--window-size=600,3000");
-		options.addArguments("user-agent=Mozilla/5.0 (Linux; Android 10; SM-F916N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.85 Mobile Safari/537.36;KAKAOTALK 2109180");
+		options.addArguments(
+				"user-agent=Mozilla/5.0 (Linux; Android 10; SM-F916N Build/QP1A.190711.020; wv) AppleWebKit/537.36 (KHTML, like Gecko) Version/4.0 Chrome/94.0.4606.85 Mobile Safari/537.36;KAKAOTALK 2109180");
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) { // 크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
@@ -236,7 +310,7 @@ public class Backup {
 				ArrayUtils.reverse(loc);
 				// System.out.println(Arrays.toString(loc)); 모든주소 출력
 			} else
-				loc = new String[1]; // 사이트맵 안 쓰는 경우 대충 아무거나 채워넣기
+				loc = new String[999]; // 사이트맵 안 쓰는 경우 대충 아무거나 채워넣기
 			// Thread.sleep(5000);
 			pageNum = -1; // 아래에서 0으로 바뀜
 			for (/* int pageNum = 1 */;/* pageNum <= 블로그끝 */;) { // 블로그 게시글 하나를 색인하는 for문
@@ -254,12 +328,17 @@ public class Backup {
 					pageNum = 0;
 					pageNum_total = 99999;
 					pageNum_sitemap = 0;
-	
+
 					return; // 종료.
 				}
-				log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " (" + String.format("%.2f",
-						(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
-						+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
+				if (Use_Sitemap)
+					log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " ("
+							+ String.format("%.2f",
+									(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
+							+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
+				else
+					log.println("[tistory-dl] 검색중인 페이지 : " + pageNum);
+					// loc[pageNum] = pageNum
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
@@ -273,7 +352,8 @@ public class Backup {
 				// 이미 다운로드한 페이지인지 확인하는 부분 끝.
 
 				// 무시해야 하는 페이지인지 확인하는 부분 시작
-				if (loc[pageNum].contains(".무시무시")) {
+
+				if (Use_Sitemap && loc[pageNum].contains(".무시무시")) {
 					log.println("[tistory-dl] 페이지 " + loc + " 무시.");
 					emptyPageCount = 0;
 					continue;
@@ -307,7 +387,7 @@ public class Backup {
 
 					try {
 						blogView = driver.findElement(By.className("tit_error"));
-						if (blogView.getAttribute("innerHTML").equals("존재하지 않는 <span class=\"br_line\"><br></span>페이지 입니다.")) {
+						if (blogView.getAttribute("innerHTML").equals("권한이 없거나 존재하지 않는 <span class=\"br_line\"><br></span>페이지입니다.") || blogView.getAttribute("innerHTML").equals("접근 권한이 없는 <span class=\"br_line\"><br></span>게시글입니다.")) {
 							// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
 							log.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
 
@@ -326,7 +406,8 @@ public class Backup {
 
 							// TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
 							log.println("[tistory-dl] 빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
-							System.in.read();
+							//System.in.read();
+							opt.delay(10000);
 						}
 						continue;
 
@@ -354,8 +435,7 @@ public class Backup {
 
 						} catch (Exception e3) {
 							e3.printStackTrace();
-							log.println(
-									"[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							// System.in.read();
 							opt.delay(10000);
 						}
@@ -418,18 +498,24 @@ public class Backup {
 					opt.delClass("blogview_head"); // 스크롤캡쳐시 상단바가 보이기 때문
 					/* 잡다구리 삭제 */
 					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delClass("adsenseMobileAd1"); // 구글광고
+					opt.delClass("adsbygoogle"); // 구글광고
 					opt.delId("bannerWrap"); // 카카오광고
+					opt.delId("area_ad"); // 카카오광고
 					opt.delId("area_ad"); // 카카오광고
 
 					opt.delClass("section_differ");
 					opt.delClass("viewpaging_wrap");
 					opt.delClass("section_relation");
-					opt.delClass("tit_post"); //"~카테고리의 다른 글" 이라고 적힌 문단
-					opt.delClass("list_post"); //"~카테고리의 다른 글" 속 섬네일들
-					opt.delClass("tit_post"); //"이 블로그 인기글" 이라고 적힌 문단
-					opt.delClass("list_thumb"); //이 블로그 인기글 속 섬네일들
-					opt.delClass("bottomBar"); //화면아래 고정으로 따라다니는 하트 댓글 공유버튼있는 막대
-					opt.delClass("doc-footer"); //티스토리|로그아웃|고객센터 그리고 잡다한 잔소리들
+					opt.delClass("tit_post"); // "~카테고리의 다른 글" 이라고 적힌 문단
+					opt.delClass("list_post"); // "~카테고리의 다른 글" 속 섬네일들
+					opt.delClass("tit_post"); // "이 블로그 인기글" 이라고 적힌 문단
+					opt.delClass("list_thumb"); // 이 블로그 인기글 속 섬네일들
+					opt.delClass("bottomBar"); // 화면아래 고정으로 따라다니는 하트 댓글 공유버튼있는 막대
+					opt.delClass("doc-footer"); // 티스토리|로그아웃|고객센터 그리고 잡다한 잔소리들
 					opt.delClass("cmt_write"); // 댓글작성칸
 					// opt.delId("comment"))); // 댓글
 					/* 잡다구리 삭제 끝 */
@@ -442,8 +528,7 @@ public class Backup {
 					for (int comment_i = 0; comment_i < 100; comment_i++) {
 						log.print("[댓글] 댓글 펼치는 중..." + comment_i);
 						// driver.findElement(By.className("link_cmtmore")).click();
-						((JavascriptExecutor) driver)
-								.executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
+						((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
 						opt.delay(delayFileDL);
 						log.println("");
 					}
@@ -462,8 +547,7 @@ public class Backup {
 					// 모바일상단바.isDisplayed();
 
 					try {
-						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10))
-								.takeScreenshot(driver);
+						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
 						final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
 						// specifies where the jpg image has to be written
 						imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
@@ -471,13 +555,13 @@ public class Backup {
 						JPEGImageWriteParam jpegParams = new JPEGImageWriteParam(null);
 						jpegParams.setCompressionMode(ImageWriteParam.MODE_EXPLICIT);
 						jpegParams.setCompressionQuality(jpegParams_setCompressionQuality); // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f
-																																								// ->100%
+						// ->100%
 
 						// writes the file with given compression level
 						// from your JPEGImageWriteParam instance
 						imgwriter.write(null, new IIOImage(스크롤캡쳐.getImage(), null, null), jpegParams); // TODO: 60000픽셀 이상 저장 못한다.
-																																														// 예외 발생시
-																																														// 직접 기록하는 코드 필요
+						// 예외 발생시
+						// 직접 기록하는 코드 필요
 
 						// 원본으로 저장하는법 -> //ImageIO.write(스크롤캡쳐.getImage(), "webp", new
 						// File(".\\fullimage.webp"));
@@ -559,7 +643,7 @@ public class Backup {
 							// imgNum + ".jpg");
 
 							innerHTML = innerHTML.replace("src=\"//", "src=\"https://"); // myskrpatch를 보니까 주소가 <img
-																																						// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
+							// src="//ac.namu.la/aa.png"> 로 되어있던...;;;;
 							innerHTML = innerHTML.replace("&amp;", "&").replace(imgURL[imgNum], imageRealname[imgNum]);
 							log.println("교체대상 : " + imgURL[imgNum]);
 							log.println("교체전주소 : " + "img" + imgNum + ".jpg");
@@ -659,13 +743,12 @@ public class Backup {
 			e.printStackTrace();
 			log.println(e);
 		}
-try {
-	driver.close();
-} catch (Exception e) {
-	//TODO: handle exception
-	log.println("몬가 몬가 아주 심각한 오류가 발생한 걸지도");
-}
-		
+		try {
+			driver.close();
+		} catch (Exception e) {
+			// TODO: handle exception
+			log.println("몬가 몬가 아주 심각한 오류가 발생한 걸지도");
+		}
 
 		return;
 	}
