@@ -55,13 +55,14 @@ public class Optimize {
   }
 
   public String getMobileURL(String url) {
-
-    System.out.println(url);
-    String[] urlsplt = url.split("/");
-    urlsplt[2] = urlsplt[2] + "/m";
-    // [2]는 ://다음의 도메인 오는 번째의 배열
-    url = String.join("/", urlsplt);
-    // Log log = new log(Log.log);
+    if (!url.contains("/m/"))
+      throw new RuntimeException("Not implemented");
+    // System.out.println(url);
+    // String[] urlsplt = url.split("/");
+    // urlsplt[2] = urlsplt[2] + "/m";
+    // // [2]는 ://다음의 도메인 오는 번째의 배열
+    // url = String.join("/", urlsplt);
+    // // Log log = new log(Log.log);
     return url;
   }
 

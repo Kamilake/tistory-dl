@@ -1,0 +1,5 @@
+Manifest-Version: 2.1
+Created-By: Kamilake
+Package-Name: calculator
+Class-Name: mainmain.Backup
+Main-Class: mainmain.Backup

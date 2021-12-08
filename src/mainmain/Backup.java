@@ -39,6 +39,9 @@ import ru.yandex.qatools.ashot.shooting.ShootingStrategies;
 import ru.yandex.qatools.ashot.AShot;
 import ru.yandex.qatools.ashot.Screenshot;
 
+import com.beust.jcommander.JCommander;
+import com.beust.jcommander.Parameter;
+
 public class Backup {
 
 	static String Version = "2021.05.20"; // 버전
@@ -78,10 +81,23 @@ public class Backup {
 	 */
 	public static String[] imageRealname = new String[1000];
 	Log log = new Log();
-	//////////////////////////////////////////////////////////////////////////////////////
 
-	public static void main(String[] args) {////////// MAIN
+	@Parameter(names={"--test", "-t"})
+	static int test;
+
+	//////////////////////////////////////////////////////////////////////////////////////
+	public static void main(String ... argv) {////////// MAIN
 		Log log = new Log();
+
+		Backup backup = new Backup();
+
+		JCommander.newBuilder()
+				.addObject(backup)
+				.build()
+				.parse(argv);
+
+		
+		log.println("테스트 " + test + " 시작");
 		log.println("[tistory-dl] 참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
 		log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
 		log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
@@ -98,8 +114,7 @@ public class Backup {
 			log.println(blogName);
 		// Backup backup = new Backup();
 		// backup.crawl();
-		Backup backup = new Backup();
-
+		
 		blogName = "bxmpe";
 		backup.crawl();
 

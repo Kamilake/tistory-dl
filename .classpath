@@ -17,5 +17,7 @@
 	<classpathentry kind="lib" path="libs/commons-io-2.4.jar"/>
 		<!-- 배열뒤집는거 -->
 	<classpathentry kind="lib" path="libs/commons-lang3-3.12.0.jar"/>
+		<!-- 플래그지정 -->
+	<classpathentry kind="lib" path="libs/jcommander-1.81.jar"/>
 	<classpathentry kind="output" path="bin"/>
 </classpath>
