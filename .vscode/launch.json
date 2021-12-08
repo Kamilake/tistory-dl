@@ -11,7 +11,7 @@
       "name": "Launch Current File",
       "request": "launch",
       "mainClass": "${file}",
-      "args": ["--test","5"]
+      "args": ["--test","5","--pageNum_total","5",],
     },
     {
       "type": "java",
