@@ -44,33 +44,54 @@ import com.beust.jcommander.Parameter;
 
 public class Backup {
 
-	static String Version = "2021.05.20"; // 버전
+	static String Version = "2021.12.08"; // 버전
+	@Parameter(names = { "--delayFileDL" }, description = "첨부파일간 딜레이 (이 값을 2초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)")
 	static int delayFileDL = 3000; // 첨부파일간 딜레이 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:4000)
+	@Parameter(names = { "--delay" }, description = "페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)")
 	static int delay = 3000; // 페이지 로딩 완료후 기다리는 시간 (이 값을 2.5초 아래로 낮추면 티스토리 서버에게 IP밴 당할 수 있습니다)(기본:2700)
+	@Parameter(names = { "--emptyPageCheckLimit" }, description = "이 횟수만큼 빈 페이지가 연속해서 나오면 완료된 것으로 간주하고 색인을 종료합니다.")
 	static int emptyPageCheckLimit = 150; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
+
+	@Parameter(names = { "--output", "-o" }, description = "파일이 저장될 경로")
 	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
-	public static final String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
-	public static final String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
+
+	@Parameter(names = { "--WEB_DRIVER_ID" }, description = "사용할 웹드라이버 (IE/크롬/파이어폭스 등등)")
+	public static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
+
+	@Parameter(names = { "--WEB_DRIVER_PATH" }, description = "웹드라이버 위치")
+	public static String WEB_DRIVER_PATH = "chromedriver.exe"; // 드라이버의 위치를 지정하세요(기본: chromedriver.exe)
+	@Parameter(names = { "--hidpi" }, description = "HiDpi(125%+) 모드에서 스크롤캡처의 호환성을 체크합니다.")
 	static boolean isHiDpi125 = false;
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////
-	///////////////////////////////////////////////////////////////////////////////////////////////
+
 	/** 시작페이지 startPage FirstPage 초기 페이지 색인을 시작하는 페이지 (기본:0) */
+	@Parameter(names = { "--pageNum" }, description = "해당 번호부터 색인을 시작합니다.")
 	static int pageNum = 0;
+
+	@Parameter(names = { "--pageNum_total" }, description = "전체 페이지 수")
 	static int pageNum_total = 99999; // 전체 페이지 수
+
+	@Parameter(names = "--help", help = true, description = "지금 보고있는 도움말을 출력합니다.")
+	static boolean help;
+
 	static int pageNum_sitemap = 0; // 사이트맵에서 내부적으로 사용하는 순서 ID
-	/** 값을 설정하면 실행중 블로그 이름 또는 블로그 ID를 묻지 않습니다. (기본:"") */
+
+	@Parameter(names = { "--name", "-n" }, description = "블로그 이름(○○○.tistory.com)| 지정하지 않으면 실행중 묻습니다.")
 	static String blogName = "";
-	/** 암호걸린 게시글의 암호 해독 */
+
+	@Parameter(names = { "--password" }, description = "암호로 보호된 게시글의 암호")
 	static String password = "1111";
 
-	static boolean Enable_Image_download = true;
-	static boolean Enable_Thumbnail_Screenshot = true;
+	@Parameter(names = { "--skip-image-download" }, description = "게시글 속 모든 사진을 다운로드하지 않습니다.")
+	static boolean Skip_Image_download = false;
+	@Parameter(names = { "--skip-thumbnail-screenshot" }, description = "스크롤캡처 이미지를 저장하지 않습니다.")
+	static boolean Skip_Thumbnail_Screenshot = false;
+	@Parameter(names = { "--allow-duplicate-downloads" }, description = "이미 존재하는 파일을 덮어씁니다.")
 	static boolean Allow_Duplicate_Downloads = false;
+	@Parameter(names = { "--use-sitemap" }, description = "티스토리 내장 사이트맵 사용", arity = 1)
 	public static boolean Use_Sitemap = true;
 	// static boolean Enable_Image_download = false;
 	// static boolean Enable_Image_download = false;
-
+	@Parameter(names = { "--jpegParams-setCompressionQuality" }, description = "섬네일 미리보기 화질 설정. 0.1 -> 10% // 1.0 ->100%")
 	float jpegParams_setCompressionQuality = 0.3f; // 섬네일 미리보기 화질 결정. 0.1f -> 10% // 1f ->100%
 	///////////////////////////////////////////////////////////////////////////////////////////////
 	public static String loc[]; // sitemap.xml 태그의 loc 부분, PC버전 도메인(인터넷에 노출되는 메인 URL)
@@ -82,22 +103,25 @@ public class Backup {
 	public static String[] imageRealname = new String[1000];
 	Log log = new Log();
 
-	@Parameter(names={"--test", "-t"})
+	@Parameter(names = { "--test", "-t" }, description = "테스트용으로 잠깐 만든 플래그")
 	static int test;
 
+	@Parameter(names = { "--debug", "--verbose", "-v" }, description = "상세한 로그를 출력합니다.")
+	private boolean debug = false;
+
 	//////////////////////////////////////////////////////////////////////////////////////
-	public static void main(String ... argv) {////////// MAIN
+	public static void main(String... argv) {////////// MAIN
 		Log log = new Log();
 
 		Backup backup = new Backup();
+		JCommander jc = new JCommander();
+		jc.setProgramName("tistory-dl");
+		jc.addObject(backup);
+		jc.parse(argv);
 
-		JCommander.newBuilder()
-				.addObject(backup)
-				.build()
-				.parse(argv);
-
-		
-		log.println("테스트 " + test + " 시작");
+		// JCommander.newBuilder().addObject(backup).build().parse(argv); //매개 변수 로드
+		// driver.close(); //위 new backup때문에 빈 크롬창 하나가 열리는데 괜히 거슬려서 추가.
+		log.println("pageNum_total : " + pageNum_total);
 		log.println("[tistory-dl] 참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
 		log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
 		log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
@@ -105,6 +129,13 @@ public class Backup {
 		log.println("[tistory-dl] 참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 		// 크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다. - 추가
 		log.println("\n[tistory-dl] tistory-dl" + Version + " - blog.Kamilake.com\n");
+
+		if (help) {
+			driver.close();
+			jc.usage();
+			log.println("[도움말] 도움말 언제 다 만들지...");
+			return;
+		}
 
 		log.print("블로그 주소 앞 부분을 입력해주세요 : ");
 		Scanner scan = new Scanner(System.in);
@@ -114,94 +145,95 @@ public class Backup {
 			log.println(blogName);
 		// Backup backup = new Backup();
 		// backup.crawl();
-		
-		blogName = "bxmpe";
-		backup.crawl();
 
-		backup = new Backup();
-		blogName = "anigil";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "ehasd6";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "felia";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "fuko";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "hongmeilin";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "irootkr";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "kamimusic";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "myskrpatch";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "nx0084";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "oogundam";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "prisis";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "seok-factory";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "sjdktp";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "skdlsgh0654";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "slugcat";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "spiritualize";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "stadtfeld";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "tosso";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "yarnzero";
-		backup.crawl();
-
-		backup = new Backup();
-		blogName = "yesbungalow";
-		backup.crawl();
-
-		// blogName = "";
+		// blogName = "bxmpe";
 		// backup.crawl();
 
+		// backup = new Backup();
+		// blogName = "anigil";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "ehasd6";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "felia";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "fuko";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "hongmeilin";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "irootkr";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "kamimusic";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "myskrpatch";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "nx0084";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "oogundam";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "prisis";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "seok-factory";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "sjdktp";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "skdlsgh0654";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "slugcat";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "spiritualize";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "stadtfeld";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "tosso";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "yarnzero";
+		// backup.crawl();
+
+		// backup = new Backup();
+		// blogName = "yesbungalow";
+		// backup.crawl();
+
+		// blogName = "";
+		backup.crawl();
+
 		scan.close();
+		driver.close();
 		System.out.println("종료됨.");
 	}
 
@@ -313,6 +345,9 @@ public class Backup {
 						} catch (ArrayIndexOutOfBoundsException e2) {
 							System.out.println("글이지만 주소를 파싱할 수 없음  : " + loc[i]);
 							loc[i] = loc[i] + ".무시무시"; // TODO: 추후 다른 방법으로 저장할 길을 모색해야겠다
+						} catch (RuntimeException e) {
+							System.out.println("PC페이지 : " + loc[i]);
+							loc[i] = loc[i] + ".무시무시"; // 카테고리페이지나 메인페이지 같은 경우는 무시를 위한 플래그 지정
 						}
 						// pageNum = (loc.split("/")[loc.split("/").length - 1]); //
 						// loc에서 얻은 URL을 기준으로 페이지 번호를 탐색하는 건데 이게 FULL TEXT로 이루어진 주소에서는 당연히 오작동하겠지
@@ -349,11 +384,12 @@ public class Backup {
 				if (Use_Sitemap)
 					log.println("[tistory-dl] 검색중인 페이지 : " + (pageNum + 1) + "/" + pageNum_total + " ("
 							+ String.format("%.2f",
-									(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total)) * 100.0)
+									(float) ((float) (pageNum == 0 ? 1 : pageNum) / (float) (pageNum_total == 0 ? 1 : pageNum_total))
+											* 100.0)
 							+ "%) [ID:" + opt.getPostID(loc[pageNum]) + "]");
 				else
 					log.println("[tistory-dl] 검색중인 페이지 : " + pageNum);
-					// loc[pageNum] = pageNum
+				// loc[pageNum] = pageNum
 
 				// 이미 다운로드한 페이지인지 확인하는 부분 시작
 				if (Allow_Duplicate_Downloads == false) {
@@ -402,7 +438,8 @@ public class Backup {
 
 					try {
 						blogView = driver.findElement(By.className("tit_error"));
-						if (blogView.getAttribute("innerHTML").equals("권한이 없거나 존재하지 않는 <span class=\"br_line\"><br></span>페이지입니다.") || blogView.getAttribute("innerHTML").equals("접근 권한이 없는 <span class=\"br_line\"><br></span>게시글입니다.")) {
+						if (blogView.getAttribute("innerHTML").equals("권한이 없거나 존재하지 않는 <span class=\"br_line\"><br></span>페이지입니다.")
+								|| blogView.getAttribute("innerHTML").equals("접근 권한이 없는 <span class=\"br_line\"><br></span>게시글입니다.")) {
 							// 좋아요 공감 삭제가 실패한다는 뜻은 해당 페이지가 없다는 뜻.
 							log.println("빈 페이지 건너뛰기 (연속 " + emptyPageCount++ + "번째)");
 
@@ -421,7 +458,7 @@ public class Backup {
 
 							// TODO: if(과도트래픽 조건 확인) 과도트래픽이면 대기
 							log.println("[tistory-dl] 빈 페이지가 아닌 다른 에러 페이지입니다.\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
-							//System.in.read();
+							// System.in.read();
 							opt.delay(10000);
 						}
 						continue;
@@ -450,7 +487,8 @@ public class Backup {
 
 						} catch (Exception e3) {
 							e3.printStackTrace();
-							log.println("[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
+							log.println(
+									"[빈 페이지도, 비밀번호 게시글도, 에러 페이지도 아닌 다른 페이지입니다.(트래픽 차단 등)\nEnter 키를 눌러서 이어서 진행하거나 Ctrl+C 키로 종료합니다.");
 							// System.in.read();
 							opt.delay(10000);
 						}
@@ -466,8 +504,8 @@ public class Backup {
 					String metaData = "";
 					metaData += "Timestamp: [" + LocalDateTime.now() + "]\n";
 					metaData += "URL: " + opt.getMobileURL(loc[pageNum]) + "\n";
-					metaData += "Enable_Image_download: " + ((Enable_Image_download ? "Enabled" : "Disabled") + "\n");
-					metaData += "Enable_Thumbnail_Screenshot: " + ((Enable_Thumbnail_Screenshot ? "Enabled" : "Disabled") + "\n");
+					metaData += "Enable_Image_download: " + ((!Skip_Image_download ? "Enabled" : "Disabled") + "\n");
+					metaData += "Enable_Thumbnail_Screenshot: " + ((!Skip_Thumbnail_Screenshot ? "Enabled" : "Disabled") + "\n");
 					metaData += "HTB " + Version + "\n" + "blog.Kamilake.com";
 
 					titleElement = driver.findElement(By.className("blogview_tit"));
@@ -543,7 +581,8 @@ public class Backup {
 					for (int comment_i = 0; comment_i < 100; comment_i++) {
 						log.print("[댓글] 댓글 펼치는 중..." + comment_i);
 						// driver.findElement(By.className("link_cmtmore")).click();
-						((JavascriptExecutor) driver).executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
+						((JavascriptExecutor) driver)
+								.executeScript("document.getElementsByClassName(\"link_cmtmore\")[0].click();");
 						opt.delay(delayFileDL);
 						log.println("");
 					}
@@ -555,14 +594,15 @@ public class Backup {
 				blogView = driver.findElement(By.className("blogview_content"));
 				String innerHTML = blogView.getAttribute("innerHTML"); // 사진 모두 찾고 치환시작
 				log.println("완료");
-				if (Enable_Thumbnail_Screenshot) {
+				if (!Skip_Thumbnail_Screenshot) {
 					log.print("[메타데이터] 섬네일 생성...");
 					// isDisplayed();
 					// 모바일상단바 = driver.findElement(By.className("cont_blog b_scroll"));
 					// 모바일상단바.isDisplayed();
 
 					try {
-						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10)).takeScreenshot(driver);
+						Screenshot 스크롤캡쳐 = new AShot().shootingStrategy(ShootingStrategies.viewportPasting(10))
+								.takeScreenshot(driver);
 						final ImageWriter imgwriter = ImageIO.getImageWritersByFormatName("jpg").next();
 						// specifies where the jpg image has to be written
 						imgwriter.setOutput(new FileImageOutputStream(new File(save.saveDir(pageNum) + "/" + "Thumbnail.jpg")));
@@ -593,7 +633,7 @@ public class Backup {
 				//
 				//
 				//
-				if (Enable_Image_download) {
+				if (!Skip_Image_download) {
 					log.println("[사진] 사진 다운로드 시작");
 					for (int i = 0; i < 1000; i++) {
 						imgNum = i; // 이미지 중복제거시 번호 수정용 변수 리셋
