@@ -122,18 +122,19 @@ public class Backup {
 		// JCommander.newBuilder().addObject(backup).build().parse(argv); //매개 변수 로드
 		// driver.close(); //위 new backup때문에 빈 크롬창 하나가 열리는데 괜히 거슬려서 추가.
 		log.println("pageNum_total : " + pageNum_total);
-		log.println("[tistory-dl] 참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
-		log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
-		log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
-		log.println("[tistory-dl] 참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
 		log.println("[tistory-dl] 참고: 티스토리 기본 블로그 주소 중 앞 부분(○○○.tistory.com)만 입력해주세요. ex) bxmpe.tistory.com이라면 bxmpe");
 		// 크롬 다른이름으로 저장이 계속 뜨는 경우는 해당 폴더가 없어서 그러는 경우도 있습니다. - 추가
-		log.println("\n[tistory-dl] tistory-dl" + Version + " - blog.Kamilake.com\n");
+		log.println("\n[tistory-dl] tistory-dl " + Version + " - Kamilake.com\n");
 
 		if (help) {
 			driver.close();
 			jc.usage();
-			log.println("[도움말] 도움말 언제 다 만들지...");
+			log.println("[tistory-dl] 도움말 언제 다 만들지...");
+			log.println("[tistory-dl] 참고: Chrome에서 사진이 전부 로딩되지 않거나 X박스 등으로 보여도 사진은 정상적으로 저장됩니다.");
+			log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
+			log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
+			log.println("[tistory-dl] 참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
+	
 			return;
 		}
 
