@@ -134,7 +134,7 @@ public class Backup {
 			log.println("[tistory-dl] 참고: 실행 파일과 같은 디렉터리에 chromedriver.exe 파일이 있어야 합니다.");
 			log.println("[tistory-dl] 참고: 실행 파일 경로 속 Backup 폴더에 데이터가 저장됩니다.");
 			log.println("[tistory-dl] 참고: 블로그 본문 HTML 텍스트와 원본 사진, 첨부파일 백업이 가능합니다.");
-	
+
 			return;
 		}
 
@@ -263,7 +263,7 @@ public class Backup {
 		options.setCapability("ignoreProtectedModeSettings", true);
 		String downloadFilepath = "";
 		if (myDir.equals("")) { // 크롬이 절대경로만 받는다.. 사실 절대경로만 받는 건 아니고 htb 실행경로랑 크롬 실행위치가 좀 달라서...
-			downloadFilepath = (System.getProperty("user.dir") + "/" + "DownloadTemp/").replace("/", "\\");
+			downloadFilepath = (System.getProperty("user.dir") + "" + "DownloadTemp/").replace("/", "\\");
 		} else {
 			downloadFilepath = (myDir + "DownloadTemp/").replace("/", "\\");
 		}
@@ -753,7 +753,7 @@ public class Backup {
 						log.println("완료");
 						log.println("[첨부파일] URL: " + attachment.getAttribute("href"));
 						log.println("[첨부파일] 파일명: " + attachment.getText());
-						driver.navigate().to(attachment.getAttribute("href")); // 파일 새 탭으로 열기
+						driver.navigate().to(attachment.getAttribute("href") + "?download"); // 파일 새 탭으로 열기
 						// log.print("[첨부파일] " + delayFileDL + "ms 대기중...");
 						// try {
 						// Thread.sleep(delayFileDL); // 다운완료까지 대기
