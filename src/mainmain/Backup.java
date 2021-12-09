@@ -53,7 +53,7 @@ public class Backup {
 	static int emptyPageCheckLimit = 150; // 이 횟수만큼 빈 페이지가 연속해서 나오면 색인을 종료합니다.
 
 	@Parameter(names = { "--output", "-o" }, description = "파일이 저장될 경로")
-	static String myDir = "A:/Tistory/"; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
+	static String myDir = ""; // A:/Tistory/ 색인이 저장될 절대 경로(비워둘 경우에는 상대경로로 저장됩니다)(기본:"")
 
 	@Parameter(names = { "--WEB_DRIVER_ID" }, description = "사용할 웹드라이버 (IE/크롬/파이어폭스 등등)")
 	public static String WEB_DRIVER_ID = "webdriver.chrome.driver"; // IE/크롬/파이어폭스 등등
