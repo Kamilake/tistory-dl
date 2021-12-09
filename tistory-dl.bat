@@ -1,2 +1,2 @@
-java -jar tistory-dl.jar
+java -jar tistory-dl.jar %*
 pause
