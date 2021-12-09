@@ -20,7 +20,11 @@ CLI에서 플래그를 받아 자동화할 수 있게 만들고 싶은데 요즘
 먼저, chromedriver.exe와 tistory-dl.jar 파일이 필요합니다.
 
 아 그리고 자바도 필요합니다. 저는 자바 8(빌드 1.8.0_241-b07)에서 만들었는데 아마 다른 버전도 문제 없을 것 같아요.
+## tistory-dl.bat (쉬운 방법)
+저거 누르면 됩니다.
+![화면 캡처 2021-12-09 104916](https://user-images.githubusercontent.com/15166740/145319967-edd25fa4-7823-45b7-b11c-f403b0cccaf3.jpg)
 
+## Batch Processing (고급 사용자)
 필수 명령은 하나도 없으며, `--name`이 없다면 실행 중 물어봅니다.
 
 <pre> Usage: tistory-dl [options]
