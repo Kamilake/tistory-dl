@@ -16,5 +16,5 @@ Wordpress 또는 Tistory 자체에 글을 그대로 복원할 수 있습니다.
 # 앞으로 할 일
 CLI에서 플래그를 받아 자동화할 수 있게 만들고 싶은데 요즘 바빠서 시간이 없네요ㅠ
 
-## 사용방법
-
+# 사용방법
+먼저, chromedriver.exe와 tistory-dl.jar 파일이 필요합니다.
